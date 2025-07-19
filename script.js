@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let GITHUB_PAT = '';
     
-    // --- API Взаимодействие ---
+    // --- API Взаимодействие (Коректно е) ---
     async function getFileContent(user, repo, path, token) {
         console.log("getFileContent: Изпращане на заявка до GitHub...");
         const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
@@ -71,19 +71,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         console.log(`Намерени ${Object.keys(commandMap).length} команди в *command-map*`);
         
+        // !!!!! НОВ, ПО-НАДЕЖДЕН МЕТОД ЗА ИЗВЛИЧАНЕ НА ОПИСАНИЯ !!!!!
         let descriptions = {};
-        let inDclBlock = false;
         lines.forEach(line => {
-            if(line.includes(";;;;;;;; DCL_START ;;;;;;;;")) inDclBlock = true;
-            if(line.includes(";;;;;;;; DCL_END ;;;;;;;;;;")) inDclBlock = false;
-
-            if(inDclBlock && line.includes(': button {') && line.includes(': text_part {')) {
+            // Търсим редове, които съдържат едновременно button и text_part
+            if (line.includes(': button {') && line.includes(': text_part {')) {
                 const keyMatch = line.match(/key = "([^"]+)"/);
+                // Този regex специално търси label, който започва с "  - ", което индикира описание
                 const labelMatch = line.match(/label = "  - ([^"]*)"/);
 
                 if (keyMatch && keyMatch[1] && labelMatch && labelMatch[1]) {
                     const key = keyMatch[1].trim();
-                    const desc = labelMatch[1].replace(/\\"/g, '"').trim();
+                    const desc = labelMatch[1].replace(/\\"/g, '"').trim(); // Обработваме ескейпнати кавички
                     descriptions[key] = desc;
                 }
             }
@@ -125,11 +124,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return { commands, sections, commandMap };
     }
 
-    const sectionToCyrillic = {
-        "Main": "Раздели", "Situacia": "Ситуация", "Naprechni": "Напречни",
-        "Nadlazhni": "Надлъжни", "Blokove": "Блокове", "Layouts": "Лейаути",
-        "Drugi": "Други", "Civil": "Civil", "Registri": "Регистри"
-    };
+
+    const sectionToCyrillic = { "Main": "Раздели", "Situacia": "Ситуация", "Naprechni": "Напречни", "Nadlazhni": "Надлъжни", "Blokove": "Блокове", "Layouts": "Лейаути", "Drugi": "Други", "Civil": "Civil", "Registri": "Регистри" };
 
     function displayCommands(commands, sections, commandMap) {
         const container = document.getElementById('commands-container');
@@ -230,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadBtn.addEventListener('click', async () => {
         console.clear();
         console.log("=====================================");
-        console.log("НОВ ОПИТ ЗА 5555ЗАРЕЖДАНЕ");
+        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ");
         console.log("=====================================");
         
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
