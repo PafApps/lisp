@@ -3,31 +3,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const appContent = document.getElementById('app-content');
     const addCommandForm = document.getElementById('add-command-form');
 
-    let GITHUB_USER = '';
-    let GITHUB_REPO = '';
-    let FILE_PATH = '';
+    // ========== ХАРДКОДНАТИ ДАННИ ==========
+    const GITHUB_USER = "PafApps";
+    const GITHUB_REPO = "lisp";
+    const FILE_PATH = "HELP_LISP.lsp";
+    // =======================================
+
     let GITHUB_PAT = '';
     
     // --- API Взаимодействие ---
-
     async function getFileContent(user, repo, path, token) {
+        console.log("getFileContent: Изпращане на заявка до GitHub...");
         const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
         try {
-            const response = await fetch(url, {
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error(`Грешка при зареждане на файла: ${response.statusText}`);
-            }
-
+            const response = await fetch(url, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } });
+            console.log("getFileContent: Получен отговор със статус:", response.status);
+            if (!response.ok) throw new Error(`Грешка при зареждане: ${response.statusText}`);
             const data = await response.json();
             const decodedContent = decodeURIComponent(escape(atob(data.content)));
+            console.log("getFileContent: Файлът е успешно изтеглен и декодиран.");
             return { content: decodedContent, sha: data.sha };
         } catch (error) {
+            console.error("getFileContent: ГРЕШКА:", error);
             updateStatus(`Грешка: ${error.message}`, 'error');
             return null;
         }
@@ -35,31 +32,16 @@ document.addEventListener('DOMContentLoaded', () => {
     
     async function updateFileContent(user, repo, path, token, newContent, sha, commitMessage) {
         const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
-        const encodedContent = btoa(unescape(encodeURIComponent(newContent))); 
-
+        const encodedContent = btoa(unescape(encodeURIComponent(newContent)));
         try {
             const response = await fetch(url, {
                 method: 'PUT',
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    message: commitMessage,
-                    content: encodedContent,
-                    sha: sha,
-                }),
+                headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: commitMessage, content: encodedContent, sha: sha }),
             });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`Грешка при запис на файла: ${errorData.message}`);
-            }
-            
-            updateStatus('Файлът е успешно обновен в GitHub!', 'success');
+            if (!response.ok) { const errorData = await response.json(); throw new Error(`Грешка при запис: ${errorData.message}`); }
+            updateStatus('Файлът е успешно обновен!', 'success');
             return await response.json();
-
         } catch (error) {
             updateStatus(`Грешка: ${error.message}`, 'error');
             return null;
@@ -67,9 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Парсване и Визуализация ---
-
     function parseLispContent(content) {
-        console.log("parseLispContent: Започвам парсване на съдържанието...");
+        console.log("parseLispContent: Започвам парсване...");
         const commands = [];
         const sections = [];
         const lines = content.split('\n');
@@ -90,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (match) commandMap[match[1]] = match[2];
             }
         });
-        console.log("parseLispContent: Намерени команди в *command-map*:", Object.keys(commandMap).length);
+        console.log(`Намерени ${Object.keys(commandMap).length} команди в *command-map*`);
         
         let descriptions = {};
         let currentDclKey = null;
@@ -108,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  }
             }
         });
-        console.log("parseLispContent: Извлечени описания от DCL:", Object.keys(descriptions).length);
+        console.log(`Извлечени ${Object.keys(descriptions).length} описания от DCL`);
 
         lines.forEach(line => {
             const sectionMatch = line.match(sectionRegex);
@@ -116,17 +97,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const sectionNameRaw = sectionMatch[1].trim();
                 const sectionName = sectionNameRaw.charAt(0) + sectionNameRaw.slice(1).toLowerCase();
                 if (!sections.includes(sectionName)) {
-                    console.log(`parseLispContent: Намерена нова секция: ${sectionName}`);
+                    console.log(`Намерена нова секция: ${sectionName}`);
                     sections.push(sectionName);
                 }
                 
                 const keys = line.match(/"[^"]+"/g);
-                
                 if (keys) {
                     const cleanedKeys = keys.map(k => k.replace(/"/g, ''));
-                    console.log(`parseLispContent: Намерени ${cleanedKeys.length} ключа за секция ${sectionName}`);
+                    console.log(`Намерени ${cleanedKeys.length} ключа за секция ${sectionName}`);
                     cleanedKeys.forEach(key => {
-                        if (commandMap[key] && !commands.some(cmd => cmd.key === key)) {
+                        if (commandMap[key] && !commands.some(cmd => cmd.key === key && cmd.section === sectionName)) {
                            commands.push({
                                key: key,
                                label: descriptions[key] || `Изпълнява: ${commandMap[key]}`,
@@ -138,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        console.log(`parseLispContent: Парсването приключи. Общо намерени команди: ${commands.length}, Общо секции: ${sections.length}`);
+        console.log(`Парсването приключи. Общо намерени команди: ${commands.length}, Общо секции: ${sections.length}`);
         return { commands, sections };
     }
 
@@ -148,19 +128,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const sectionSelect = document.getElementById('command-section');
         container.innerHTML = '';
         sectionSelect.innerHTML = '<option value="" disabled selected>Избери секция...</option>';
-        const sectionsWithCommands = sections.filter(section => sections.includes(section));
         
-        sectionsWithCommands.forEach(section => {
-            const sectionDiv = document.createElement('div');
-            sectionDiv.className = 'command-section';
-            const sectionTitle = document.createElement('h3');
-            sectionTitle.textContent = section;
-            sectionDiv.appendChild(sectionTitle);
-
+        const sectionsForDropdown = sections.filter(s => s.toLowerCase() !== 'main');
+        sectionsForDropdown.forEach(section => {
             const sectionOption = document.createElement('option');
             sectionOption.value = section.toUpperCase();
             sectionOption.textContent = section;
             sectionSelect.appendChild(sectionOption);
+        });
+
+        const sectionsWithCommands = sections.filter(section => commands.some(cmd => cmd.section === section));
+        
+        sectionsWithCommands.forEach(section => {
+            const details = document.createElement('details');
+            const summary = document.createElement('summary');
+            summary.textContent = section;
+            details.appendChild(summary);
             
             const commandsInSection = commands.filter(cmd => cmd.section === section);
             commandsInSection.forEach(cmd => {
@@ -169,16 +152,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const copyBtn = document.createElement('button');
                 copyBtn.textContent = 'Копирай';
                 copyBtn.className = 'copy-btn';
-                copyBtn.title = 'Копирай командата в клипборда';
+                copyBtn.title = `Копирай "${commandMap[cmd.key] || cmd.key}"`;
                 copyBtn.addEventListener('click', () => {
                     navigator.clipboard.writeText(commandMap[cmd.key] || cmd.key);
                     updateStatus(`Командата "${commandMap[cmd.key] || cmd.key}" е копирана!`, 'success');
                 });
                 entryDiv.innerHTML = `<code>${cmd.key}</code><p>${cmd.label}</p>`;
                 entryDiv.prepend(copyBtn);
-                sectionDiv.appendChild(entryDiv);
+                details.appendChild(entryDiv);
             });
-            container.appendChild(sectionDiv);
+            container.appendChild(details);
         });
     }
 
@@ -198,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let sectionKeysEndIndex = lines.findIndex(line => line.includes(sectionKeysEndMarker));
         if (sectionKeysEndIndex === -1) { updateStatus(`Грешка: Не е намерен маркер за ключове: ${sectionKeysEndMarker}`, 'error'); return originalContent; }
         
-        let targetLineIndex = sectionKeysEndIndex -1;
+        let targetLineIndex = sectionKeysEndIndex - 1;
         let lineToModify = lines[targetLineIndex];
         let closingParenIndex = lineToModify.lastIndexOf(')');
         let keyToInsert = ` \"${newCommand.key}\"`;
@@ -242,36 +225,29 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ");
         console.log("=====================================");
         
-        console.log("1. Прочитане на потребителските данни...");
-        GITHUB_USER = document.getElementById('githubUser').value.trim();
-        GITHUB_REPO = document.getElementById('githubRepo').value.trim();
-        FILE_PATH = document.getElementById('filePath').value.trim();
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
-        console.log(" -> Потребител:", GITHUB_USER);
-        console.log(" -> Хранилище:", GITHUB_REPO);
-        console.log(" -> Файл:", FILE_PATH);
-        console.log(" -> Токен (дължина):", GITHUB_PAT.length);
-
-        if (!GITHUB_USER || !GITHUB_REPO || !FILE_PATH || !GITHUB_PAT) {
-            updateStatus('Моля, попълнете всички полета за настройка.', 'error');
+        if (!GITHUB_PAT) {
+            updateStatus('Моля, въведете Personal Access Token (PAT).', 'error');
             return;
         }
+        
+        console.log(`1. Данни: User=${GITHUB_USER}, Repo=${GITHUB_REPO}, Path=${FILE_PATH}, Token(length)=${GITHUB_PAT.length}`);
         
         appContent.classList.remove('hidden');
         document.getElementById('commands-container').innerHTML = '<p class="loading">Зареждане...</p>';
         
-        console.log("3. Извикване на getFileContent...");
+        console.log("2. Извикване на getFileContent...");
         const fileData = await getFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT);
         
         if (fileData) {
-            console.log("4. Данните са получени. Извикване на parseLispContent...");
+            console.log("3. Данните са получени. Извикване на parseLispContent...");
             const { commands, sections } = parseLispContent(fileData.content);
             
-            console.log("5. Парсването приключи. Извикване на displayCommands...");
+            console.log("4. Парсването приключи. Извикване на displayCommands...");
             displayCommands(commands, sections);
-            console.log("6. displayCommands приключи.");
+            console.log("5. displayCommands приключи.");
         } else {
-            console.error("7. getFileContent не върна данни. Процесът е прекратен.");
+            console.error("6. getFileContent не върна данни. Процесът е прекратен.");
         }
     });
 
