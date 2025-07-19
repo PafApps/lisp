@@ -236,6 +236,7 @@
       ("QBZ" "QBZ" "  - автоматично огражда площите на нов баласт и защитен пласт. Може да дава грешки при не-добре затворени контури и по-специфични случаи")
       ("QALL" "QH" "  - ограждане на всички количества 1 по 1, като изолира нужните слоеве и се огражда като с хетч (ако контура не е затворен или има блокове понякога дава грешки)")
       ("QB" "QB" "  - ограждане на всички количества 1 по 1, като изолира нужните слоеве, маркират се обектите между които да се пусне граница и се огражда с Boundery. По-надеждно е от QH")
+      ("d3t" "   d3t  " "  - изкарва теренните коти в напречен профил през 1 метър.")
     )
   )
   ;;; END DCL NAPRECHNI ITEMS
@@ -588,6 +589,7 @@
     ("ДРУГИ"       . "ДРУГИ")
     ("СИВИЛ"       . "СИВИЛ")
     ("РЕГИСТРИ"    . "РЕГИСТРИ")
+    ("d3t" . "d3t")
 ;;; END COMMAND MAP
   )
 )
@@ -606,7 +608,7 @@
 ;;; END SITUACIA KEYS
 
 ;;; START NAPRECHNI KEYS
-(setq *naprechni-command-keys* '("d3" "a3" "a3a" "km" "otkos" "naklon" "dimc" "qe" "qec" "Ln" "Lо" "addtoblock" "ndel" "ncut" "nmove" "delblocks" "calc" "wf" "wfb" "laq" "DIt" "regATT" "regATT2" "regATTall" "ATTCH" "a3all" "D3all" "D3all2" "d3RO" "QBZ" "QALL" "QB" "back"))
+(setq *naprechni-command-keys* '("d3" "a3" "a3a" "km" "otkos" "naklon" "dimc" "qe" "qec" "Ln" "Lо" "addtoblock" "ndel" "ncut" "nmove" "delblocks" "calc" "wf" "wfb" "laq" "DIt" "regATT" "regATT2" "regATTall" "ATTCH" "a3all" "D3all" "D3all2" "d3RO" "QBZ" "QALL" "QB" "d3t" "back"))
 ;;; END NAPRECHNI KEYS
 
 ;;; START NADLAZHNI KEYS
