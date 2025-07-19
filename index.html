@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мениджър на AutoLISP Команди</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Мениджър на AutoLISP Команди</h1>
+        <p>Този инструмент чете и записва команди директно във вашия Lisp файл в GitHub.</p>
+
+        <div id="config-section">
+            <h2>Настройки за GitHub</h2>
+            <input type="text" id="githubUser" placeholder="Вашето GitHub потребителско име">
+            <input type="text" id="githubRepo" placeholder="Име на GitHub хранилището">
+            <input type="text" id="filePath" placeholder="Път до файла (напр. help.lsp)">
+            <input type="password" id="githubPat" placeholder="Personal Access Token (PAT)">
+            <button id="load-commands-btn">Зареди Командите</button>
+        </div>
+
+        <hr>
+
+        <div id="app-content" class="hidden">
+            <h2>Списък с команди</h2>
+            <div id="commands-container">
+                <p class="loading">Зареждане на командите...</p>
+            </div>
+
+            <div class="form-container">
+                <h2>Добави нова команда</h2>
+                <form id="add-command-form">
+                    <select id="command-section" required>
+                        <option value="" disabled selected>Избери секция...</option>
+                    </select>
+                    <input type="text" id="command-key" placeholder="Ключ на командата (напр. km)" required>
+                    <textarea id="command-label" placeholder="Описание на командата" required></textarea>
+                    <button type="submit">Добави и Запази в GitHub</button>
+                </form>
+            </div>
+        </div>
+        
+        <div id="status-message"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
