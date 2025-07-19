@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мениджър на AutoLISP Команди</title>
+    <title>Мениджър на AutoLISP Команди55</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -33,6 +33,16 @@
                     <input type="text" id="command-key" placeholder="Ключ на командата (напр. dd)" required>
                     <textarea id="command-label" placeholder="Описание на командата" required></textarea>
                     <button type="submit">Добави и Запази в GitHub</button>
+                </form>
+            </div>
+
+            <hr>
+            <div class="form-container">
+                <h2>Изтрий съществуваща команда</h2>
+                <form id="delete-command-form">
+                    <p>Въведете точния ключ на командата, която искате да премахнете. Операцията е необратима.</p>
+                    <input type="text" id="delete-command-key" placeholder="Ключ на командата за изтриване (напр. dd)" required>
+                    <button type="submit" class="delete-btn">Изтрий Командата от GitHub</button>
                 </form>
             </div>
         </div>
