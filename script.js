@@ -128,7 +128,7 @@ const sectionRegex = /;;; START (.*) KEYS/;
         GITHUB_REPO = document.getElementById('githubRepo').value.trim();
         FILE_PATH = document.getElementById('filePath').value.trim();
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
-        console.log(" -> Потребител:", GITHUB_USER);
+        console.log(" -> Потребителfgggggggg:", GITHUB_USER);
         console.log(" -> Хранилище:", GITHUB_REPO);
         console.log(" -> Файл:", FILE_PATH);
         console.log(" -> Токен (дължина):", GITHUB_PAT.length);
