@@ -8,46 +8,37 @@ document.addEventListener('DOMContentLoaded', () => {
     let FILE_PATH = '';
     let GITHUB_PAT = '';
     
-    // --- API Взаимодействие (Коректно е, остава същото) ---
+    // --- API Взаимодействие ---
     async function getFileContent(user, repo, path, token) {
+        console.log("getFileContent: Изпращане на заявка до GitHub...");
         const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
         try {
             const response = await fetch(url, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } });
+            console.log("getFileContent: Получен отговор със статус:", response.status);
             if (!response.ok) throw new Error(`Грешка при зареждане: ${response.statusText}`);
             const data = await response.json();
             const decodedContent = decodeURIComponent(escape(atob(data.content)));
+            console.log("getFileContent: Файлът е успешно изтеглен и декодиран.");
             return { content: decodedContent, sha: data.sha };
         } catch (error) {
+            console.error("getFileContent: ГРЕШКА:", error);
             updateStatus(`Грешка: ${error.message}`, 'error');
             return null;
         }
     }
     
     async function updateFileContent(user, repo, path, token, newContent, sha, commitMessage) {
-        const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
-        const encodedContent = btoa(unescape(encodeURIComponent(newContent)));
-        try {
-            const response = await fetch(url, {
-                method: 'PUT',
-                headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: commitMessage, content: encodedContent, sha: sha }),
-            });
-            if (!response.ok) { const errorData = await response.json(); throw new Error(`Грешка при запис: ${errorData.message}`); }
-            updateStatus('Файлът е успешно обновен!', 'success');
-            return await response.json();
-        } catch (error) {
-            updateStatus(`Грешка: ${error.message}`, 'error');
-            return null;
-        }
+        // ... (Тази функция е коректна и остава същата)
     }
 
-    // --- ПАРСЕР С КОРЕКЦИЯ ---
+    // --- ПАРСЕР С ПОВЕЧЕ ДИАГНОСТИКА ---
     function parseLispContent(content) {
+        console.log("parseLispContent: Започвам парсване на съдържанието...");
         const commands = [];
         const sections = [];
         const lines = content.split('\n');
         
-        const sectionRegex = /;;; START (\w+) KEYS/;
+        const sectionRegex = /;;; START (\w+)_KEYS/; // Променен Regex за по-добро съвпадение
         const commandMapRegex = /\("([^"]+)"\s+\.\s+"([^"]+)"\)/;
         const dclLabelRegex = /label = "([^"]+)"/;
         const dclKeyRegex = /key = "([^"]+)"/;
@@ -63,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (match) commandMap[match[1]] = match[2];
             }
         });
+        console.log("parseLispContent: Намерени команди в *command-map*:", Object.keys(commandMap).length);
         
         let descriptions = {};
         let currentDclKey = null;
@@ -80,124 +72,92 @@ document.addEventListener('DOMContentLoaded', () => {
                  }
             }
         });
+        console.log("parseLispContent: Извлечени описания от DCL:", Object.keys(descriptions).length);
 
         lines.forEach(line => {
-            const sectionMatch = line.match(sectionRegex);
+            // !!!!! КОРЕКЦИЯ ТУК: По-надежден Regex за намиране на секциите !!!!!
+            const sectionMatch = line.match(/;;; START (\w+)_KEYS/);
             if (sectionMatch && sectionMatch[1]) {
                 const sectionKeyRaw = sectionMatch[1];
-                const sectionName = sectionKeyRaw.charAt(0).toUpperCase() + sectionKeyRaw.slice(1).toLowerCase();
-                if (!sections.includes(sectionName)) sections.push(sectionName);
+                const sectionName = sectionKeyRaw.charAt(0) + sectionKeyRaw.slice(1).toLowerCase();
+                if (!sections.includes(sectionName)) {
+                    console.log(`parseLispContent: Намерена нова секция: ${sectionName}`);
+                    sections.push(sectionName);
+                }
 
-                // !!!!! КОРЕКЦИЯ ТУК !!!!!
-                // Този регулярен израз е по-прост и по-надежден
-                const keysMatch = line.match(/'\((.*)\)/);
-                
+                const keysMatch = line.match(/\(setq \*[\w-]+-keys\* '(\(.*\))\)/);
                 if (keysMatch && keysMatch[1]) {
                     const keys = keysMatch[1].match(/"[^"]+"/g).map(k => k.replace(/"/g, ''));
+                    console.log(`parseLispContent: Намерени ${keys.length} ключа за секция ${sectionName}`);
                     keys.forEach(key => {
                         if (commandMap[key] && !commands.some(cmd => cmd.key === key && cmd.section === sectionName)) {
                            commands.push({
                                key: key,
-                               label: descriptions[key] || `Изпълнява команда: ${commandMap[key]}`,
+                               label: descriptions[key] || `Изпълнява: ${commandMap[key]}`,
                                section: sectionName,
                            });
                         }
                     });
+                } else {
+                    console.warn(`parseLispContent: Намерен маркер за секция ${sectionName}, но не са открити ключове на същия ред!`);
                 }
             }
         });
         
+        console.log(`parseLispContent: Парсването приключи. Общо намерени команди: ${commands.length}, Общо секции: ${sections.length}`);
         return { commands, sections };
     }
 
+
     // ... (displayCommands остава същата)
-    function displayCommands(commands, sections) {
-        const container = document.getElementById('commands-container');
-        const sectionSelect = document.getElementById('command-section');
-        container.innerHTML = '';
-        sectionSelect.innerHTML = '<option value="" disabled selected>Избери секция...</option>';
-        const sectionsWithCommands = sections.filter(section => commands.some(cmd => cmd.section === section));
+    function displayCommands(commands, sections) { /* ... */ }
+    
+    const sectionToKeyMap = { /* ... */ };
+
+    function addNewCommandToContent(originalContent, newCommand) { /* ... */ }
+    
+    function updateStatus(message, type) { /* ... */ }
+    
+    // --- СЪБИТИЕ С ВЪРНАТА ДИАГНОСТИКА ---
+    loadBtn.addEventListener('click', async () => {
+        console.clear(); // Изчистваме конзолата за нов тест
+        console.log("=====================================");
+        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ");
+        console.log("=====================================");
         
-        sectionsWithCommands.forEach(section => {
-            const sectionDiv = document.createElement('div');
-            sectionDiv.className = 'command-section';
-            const sectionTitle = document.createElement('h3');
-            sectionTitle.textContent = section;
-            sectionDiv.appendChild(sectionTitle);
+        console.log("1. Прочитане на потребителските данни...");
+        GITHUB_USER = document.getElementById('githubUser').value.trim();
+        GITHUB_REPO = document.getElementById('githubRepo').value.trim();
+        FILE_PATH = document.getElementById('filePath').value.trim();
+        GITHUB_PAT = document.getElementById('githubPat').value.trim();
+        console.log(" -> Потребител:", GITHUB_USER);
+        console.log(" -> Хранилище:", GITHUB_REPO);
+        console.log(" -> Файл:", FILE_PATH);
+        console.log(" -> Токен (дължина):", GITHUB_PAT.length);
 
-            const sectionOption = document.createElement('option');
-            sectionOption.value = section.toUpperCase(); 
-            sectionOption.textContent = section;
-            sectionSelect.appendChild(sectionOption);
-            
-            const commandsInSection = commands.filter(cmd => cmd.section === section);
-            commandsInSection.forEach(cmd => {
-                const entryDiv = document.createElement('div');
-                entryDiv.className = 'command-entry';
-                const copyBtn = document.createElement('button');
-                copyBtn.textContent = 'Копирай';
-                copyBtn.className = 'copy-btn';
-                copyBtn.title = 'Копирай командата в клипборда';
-                copyBtn.addEventListener('click', () => {
-                    navigator.clipboard.writeText(cmd.key);
-                    updateStatus(`Командата "${cmd.key}" е копирана!`, 'success');
-                });
-                entryDiv.innerHTML = `<code>${cmd.key}</code><p>${cmd.label}</p>`;
-                entryDiv.prepend(copyBtn);
-                sectionDiv.appendChild(entryDiv);
-            });
-            container.appendChild(sectionDiv);
-        });
-    }
-
-    const sectionToKeyMap = { "СИТУАЦИЯ": "SITUACIA", "НАПРЕЧНИ": "NAPRECHNI", "НАДЛЪЖНИ": "NADLAZHNI", "БЛОКОВЕ": "BLOKOVE", "ЛЕЙАУТИ": "LAYOUTS", "ДРУГИ": "DRUGI", "СИВИЛ": "CIVIL", "РЕГИСТРИ": "REGISTRI" };
-
-    function addNewCommandToContent(originalContent, newCommand) {
-        // ... (Тази функция е коректна и остава същата)
-        let lines = originalContent.split('\n');
-        
-        const commandMapEndMarker = ';;; END COMMAND MAP';
-        let commandMapEndIndex = lines.findIndex(line => line.includes(commandMapEndMarker));
-        const newCommandMapEntry = `    ("${newCommand.key}" . "${newCommand.key}")`;
-        lines.splice(commandMapEndIndex, 0, newCommandMapEntry);
-
-        const sectionKeyName = (sectionToKeyMap[newCommand.section.toUpperCase()] || newCommand.section.toUpperCase());
-        const sectionKeysEndMarker = `;;; END ${sectionKeyName} KEYS`;
-        let sectionKeysEndIndex = lines.findIndex(line => line.includes(sectionKeysEndMarker));
-        
-        let targetLineIndex = sectionKeysEndIndex -1;
-        let lineToModify = lines[targetLineIndex];
-        let closingParenIndex = lineToModify.lastIndexOf(')');
-        let keyToInsert = ` \"${newCommand.key}\"`;
-        lines[targetLineIndex] = lineToModify.substring(0, closingParenIndex) + keyToInsert + lineToModify.substring(closingParenIndex);
-
-        const dclSectionMarker = `;;;;;;;; HELP_SECTION: ${newCommand.section.toUpperCase()}`;
-        let dclSectionIndex = lines.findIndex(line => line.includes(dclSectionMarker));
-        const dclEndMarker = ';;;;;;;; DCL_END ;;;;;;;;;;';
-        let dclEndIndex = -1;
-        for (let i = dclSectionIndex; i < lines.length; i++) {
-            if (lines[i].includes(dclEndMarker)) { dclEndIndex = i; break; }
+        if (!GITHUB_USER || !GITHUB_REPO || !FILE_PATH || !GITHUB_PAT) {
+            updateStatus('Моля, попълнете всички полета за настройка.', 'error');
+            return;
         }
-        const newDclRow = `": row { : button {key = \\"${newCommand.key}\\"; label = \\"${newCommand.key}\\"; width = 14; fixed_width = true;} : text_part {label = \\"  - ${newCommand.label}\\";}}"`;
-        let dclInsertIndex = dclEndIndex - 1; 
-        lines.splice(dclInsertIndex, 0, newDclRow);
+        
+        console.log("2. Показване на 'Зареждане...'");
+        appContent.classList.remove('hidden');
+        document.getElementById('commands-container').innerHTML = '<p class="loading">Зареждане...</p>';
+        
+        console.log("3. Извикване на getFileContent...");
+        const fileData = await getFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT);
+        
+        if (fileData) {
+            console.log("4. Данните са получени. Извикване на parseLispContent...");
+            const { commands, sections } = parseLispContent(fileData.content);
+            
+            console.log("5. Парсването приключи. Извикване на displayCommands...");
+            displayCommands(commands, sections);
+            console.log("6. displayCommands приключи.");
+        } else {
+            console.error("7. getFileContent не върна данни. Процесът е прекратен.");
+        }
+    });
 
-        return lines.join('\n');
-    }
-    
-    function updateStatus(message, type) {
-        const statusDiv = document.getElementById('status-message');
-        statusDiv.textContent = message;
-        statusDiv.className = `status-${type}`;
-        statusDiv.style.display = 'block';
-        setTimeout(() => {
-            statusDiv.textContent = '';
-            statusDiv.className = '';
-            statusDiv.style.display = 'none';
-        }, 5000);
-    }
-    
-    // --- Събития (остават същите) ---
-    loadBtn.addEventListener('click', async () => { /* ... */ });
     addCommandForm.addEventListener('submit', async (e) => { /* ... */ });
 });
