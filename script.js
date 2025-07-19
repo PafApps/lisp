@@ -38,9 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const sections = [];
         const lines = content.split('\n');
         
-        const sectionRegex = /;;; START (\w+)_KEYS/; // Променен Regex за по-добро съвпадение
+const sectionRegex = /;;; START (.*) KEYS/; 
         const commandMapRegex = /\("([^"]+)"\s+\.\s+"([^"]+)"\)/;
-        const dclLabelRegex = /label = "([^"]+)"/;
+        const dclLabelRegex = /label = "([^"]*)"/; 
         const dclKeyRegex = /key = "([^"]+)"/;
 
         let commandMap = {};
@@ -59,38 +59,39 @@ document.addEventListener('DOMContentLoaded', () => {
         let descriptions = {};
         let currentDclKey = null;
         lines.forEach(line => {
-            if (line.includes(': button {')) {
+             if (line.includes(': button {')) {
                 const keyMatch = line.match(dclKeyRegex);
-                if (keyMatch) currentDclKey = keyMatch[1];
+                if (keyMatch) currentDclKey = keyMatch[1].trim();
             }
             if (line.includes(': text_part {')) {
                  const labelMatch = line.match(dclLabelRegex);
                  if(labelMatch && currentDclKey) {
                     const desc = labelMatch[1].trim().replace(/^-\s*/, '').trim();
                     if(desc) descriptions[currentDclKey] = desc;
-                    currentDclKey = null;
+                    currentDclKey = null; 
                  }
             }
         });
         console.log("parseLispContent: Извлечени описания от DCL:", Object.keys(descriptions).length);
 
         lines.forEach(line => {
-            // !!!!! КОРЕКЦИЯ ТУК: По-надежден Regex за намиране на секциите !!!!!
-            const sectionMatch = line.match(/;;; START (\w+)_KEYS/);
+            const sectionMatch = line.match(sectionRegex);
             if (sectionMatch && sectionMatch[1]) {
-                const sectionKeyRaw = sectionMatch[1];
-                const sectionName = sectionKeyRaw.charAt(0) + sectionKeyRaw.slice(1).toLowerCase();
+                const sectionNameRaw = sectionMatch[1].trim();
+                // Преобразуваме име като SITUACIA в Situacia
+                const sectionName = sectionNameRaw.charAt(0) + sectionNameRaw.slice(1).toLowerCase();
                 if (!sections.includes(sectionName)) {
                     console.log(`parseLispContent: Намерена нова секция: ${sectionName}`);
                     sections.push(sectionName);
                 }
-
-                const keysMatch = line.match(/\(setq \*[\w-]+-keys\* '(\(.*\))\)/);
+                
+                // Този Regex е по-надежден, защото не зависи от името на променливата
+                const keysMatch = line.match(/'(\(.*\))/);
                 if (keysMatch && keysMatch[1]) {
                     const keys = keysMatch[1].match(/"[^"]+"/g).map(k => k.replace(/"/g, ''));
                     console.log(`parseLispContent: Намерени ${keys.length} ключа за секция ${sectionName}`);
                     keys.forEach(key => {
-                        if (commandMap[key] && !commands.some(cmd => cmd.key === key && cmd.section === sectionName)) {
+                        if (commandMap[key] && !commands.some(cmd => cmd.key === key)) {
                            commands.push({
                                key: key,
                                label: descriptions[key] || `Изпълнява: ${commandMap[key]}`,
@@ -98,8 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
                            });
                         }
                     });
-                } else {
-                    console.warn(`parseLispContent: Намерен маркер за секция ${sectionName}, но не са открити ключове на същия ред!`);
                 }
             }
         });
@@ -107,7 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(`parseLispContent: Парсването приключи. Общо намерени команди: ${commands.length}, Общо секции: ${sections.length}`);
         return { commands, sections };
     }
-
 
     // ... (displayCommands остава същата)
     function displayCommands(commands, sections) { /* ... */ }
