@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let GITHUB_PAT = '';
     
-    // --- API Взаимодействие (Коректно е) ---
+    // --- API Взаимодействие ---
     async function getFileContent(user, repo, path, token) {
         console.log("getFileContent: Изпращане на заявка до GitHub...");
         const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const sectionRegex = /;;; START (.*) KEYS/;
         const commandMapRegex = /\("([^"]+)"\s+\.\s+"([^"]+)"\)/;
-
+        
         let commandMap = {};
         let inCommandMap = false;
 
@@ -71,11 +71,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         console.log(`Намерени ${Object.keys(commandMap).length} команди в *command-map*`);
         
-        // !!!!! НОВ, ПО-НАДЕЖДЕН МЕТОД ЗА ИЗВЛИЧАНЕ НА ОПИСАНИЯ !!!!!
         let descriptions = {};
+        let inDclBlock = false;
         lines.forEach(line => {
-            // Търсим редове, които съдържат едновременно button и text_part
-            if (line.includes(': button {') && line.includes(': text_part {')) {
+            if(line.includes(";;;;;;;; DCL_START ;;;;;;;;")) inDclBlock = true;
+            if(line.includes(";;;;;;;; DCL_END ;;;;;;;;;;")) inDclBlock = false;
+
+            if(inDclBlock && line.includes(': button {') && line.includes(': text_part {')) {
                 const keyMatch = line.match(/key = "([^"]+)"/);
                 const labelMatch = line.match(/label = "  - ([^"]*)"/);
 
@@ -95,6 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const sectionNameRaw = sectionMatch[1].trim();
                 const sectionName = sectionNameRaw.charAt(0).toUpperCase() + sectionNameRaw.slice(1).toLowerCase();
                 if (!sections.includes(sectionName)) {
+                    console.log(`Намерена нова секция: ${sectionName}`);
                     sections.push(sectionName);
                 }
                 
@@ -103,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const keys = nextLine.match(/"[^"]+"/g);
                     if (keys) {
                         const cleanedKeys = keys.map(k => k.replace(/"/g, ''));
+                        console.log(`Намерени ${cleanedKeys.length} ключа за секция ${sectionName}`);
                         cleanedKeys.forEach(key => {
                             if (commandMap[key] && !commands.some(cmd => cmd.key === key && cmd.section === sectionName)) {
                                commands.push({
@@ -121,8 +125,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return { commands, sections, commandMap };
     }
 
-
-    const sectionToCyrillic = { "Main": "Раздели", "Situacia": "Ситуация", "Naprechni": "Напречни", "Nadlazhni": "Надлъжни", "Blokove": "Блокове", "Layouts": "Лейаути", "Drugi": "Други", "Civil": "Civil", "Registri": "Регистри" };
+    const sectionToCyrillic = {
+        "Main": "Раздели", "Situacia": "Ситуация", "Naprechni": "Напречни",
+        "Nadlazhni": "Надлъжни", "Blokove": "Блокове", "Layouts": "Лейаути",
+        "Drugi": "Други", "Civil": "Civil", "Registri": "Регистри"
+    };
 
     function displayCommands(commands, sections, commandMap) {
         const container = document.getElementById('commands-container');
@@ -223,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadBtn.addEventListener('click', async () => {
         console.clear();
         console.log("=====================================");
-        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ555555554");
+        console.log("НОВ ОПИТ ЗА 5555ЗАРЕЖДАНЕ");
         console.log("=====================================");
         
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
