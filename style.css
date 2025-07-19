@@ -91,3 +91,10 @@ code {
 .status-success { background-color: #d4edda; color: #155724; }
 .status-error { background-color: #f8d7da; color: #721c24; }
 .loading { text-align: center; color: #666; padding: 20px; }
+
+.delete-btn {
+    background-color: #dc3545; /* Червен цвят за внимание */
+}
+.delete-btn:hover {
+    background-color: #c82333;
+}
