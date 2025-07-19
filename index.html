@@ -9,13 +9,9 @@
 <body>
     <div class="container">
         <h1>Мениджър на AutoLISP Команди</h1>
-        <p>Този инструмент чете и записва команди директно във вашия Lisp файл в GitHub.</p>
+        <p>Въведете вашия Personal Access Token (PAT), за да заредите и управлявате командите.</p>
 
         <div id="config-section">
-            <h2>Настройки за GitHub</h2>
-            <input type="text" id="githubUser" placeholder="Вашето GitHub потребителско име">
-            <input type="text" id="githubRepo" placeholder="Име на GitHub хранилището">
-            <input type="text" id="filePath" placeholder="Път до файла (напр. help.lsp)">
             <input type="password" id="githubPat" placeholder="Personal Access Token (PAT)">
             <button id="load-commands-btn">Зареди Командите</button>
         </div>
@@ -34,14 +30,14 @@
                     <select id="command-section" required>
                         <option value="" disabled selected>Избери секция...</option>
                     </select>
-                    <input type="text" id="command-key" placeholder="Ключ на командата (напр. km)" required>
+                    <input type="text" id="command-key" placeholder="Ключ на командата (напр. dd)" required>
                     <textarea id="command-label" placeholder="Описание на командата" required></textarea>
                     <button type="submit">Добави и Запази в GitHub</button>
                 </form>
             </div>
         </div>
         
-        <div id="status-message"></div>
+        <div id="status-message" style="display: none;"></div>
     </div>
 
     <script src="script.js"></script>
