@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let FILE_PATH = '';
     let GITHUB_PAT = '';
     
-    // --- API Взаимодействие (Без промяна тук) ---
+    // --- API Взаимодействие ---
 
     async function getFileContent(user, repo, path, token) {
         const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     async function updateFileContent(user, repo, path, token, newContent, sha, commitMessage) {
         const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
-        const encodedContent = btoa(newContent);
+        const encodedContent = btoa(unescape(encodeURIComponent(newContent))); // Правилно кодиране за кирилица
 
         try {
             const response = await fetch(url, {
@@ -66,49 +66,81 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
-    // --- Парсване и Визуализация (Без промяна тук) ---
+    // --- Парсване и Визуализация ---
 
     function parseLispContent(content) {
         const commands = [];
         const sections = [];
         const lines = content.split('\n');
-        let currentSection = 'Общи';
+        
+        const sectionRegex = /;;; START (\w+) KEYS/;
+        const commandMapRegex = /\("([^"]+)"\s+\.\s+"([^"]+)"\)/;
+        const dclLabelRegex = /: text_part {label = "([^"]*)";}/;
 
-        const sectionRegex = /;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  HELP (.*)     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;/;
-        const keyRegex = /key = "(.*)";/;
-        const labelRegex = /label = "(.*)";/;
 
+        let commandMap = {};
+        let inCommandMap = false;
+
+        // 1. Извличаме всички команди и техните AutoCAD еквиваленти
+        lines.forEach(line => {
+            if (line.includes(';;; START COMMAND MAP')) inCommandMap = true;
+            if (line.includes(';;; END COMMAND MAP')) inCommandMap = false;
+
+            if (inCommandMap) {
+                const match = line.match(commandMapRegex);
+                if (match) {
+                    commandMap[match[1]] = match[2];
+                }
+            }
+        });
+        
+        // 2. Извличаме описанията от DCL блоковете
+        let descriptions = {};
+        let currentDclKey = null;
+        lines.forEach(line => {
+            const keyMatch = line.match(/: button {key = "([^"]+)"/);
+            if (keyMatch) {
+                currentDclKey = keyMatch[1];
+            }
+            const labelMatch = line.match(dclLabelRegex);
+            if(labelMatch && currentDclKey) {
+                descriptions[currentDclKey] = labelMatch[1].trim().replace("  - ", "");
+                currentDclKey = null; // Нулираме, за да не присвоим грешно описание
+            }
+        });
+
+
+        // 3. Обхождаме секциите и конструираме финалния обект
         lines.forEach(line => {
             const sectionMatch = line.match(sectionRegex);
             if (sectionMatch) {
-                currentSection = sectionMatch[1].trim();
-                if (!sections.includes(currentSection)) {
-                    sections.push(currentSection);
-                }
-            }
+                const sectionNameRaw = sectionMatch[1];
+                const sectionName = sectionNameRaw.charAt(0).toUpperCase() + sectionNameRaw.slice(1).toLowerCase().replace("_keys", "");
 
-            const keyMatch = line.trim().match(keyRegex);
-            if (keyMatch) {
-                let label = '';
-                const nextLines = lines.slice(lines.indexOf(line) + 1, lines.indexOf(line) + 5);
-                for(const nextLine of nextLines){
-                    const labelMatch = nextLine.trim().match(labelRegex);
-                    if(labelMatch){
-                        label = labelMatch[1].replace(/\\"/g, '"');
-                        break;
-                    }
+                if (!sections.includes(sectionName)) {
+                    sections.push(sectionName);
                 }
-                
-                commands.push({
-                    key: keyMatch[1].trim(),
-                    label: label || "Няма описание",
-                    section: currentSection
-                });
+
+                const keysMatch = line.match(/\(setq \*[\w-]+-keys\* '(\(.*\))\)/);
+                if (keysMatch) {
+                    const keys = keysMatch[1].match(/"[^"]+"/g).map(k => k.replace(/"/g, ''));
+                    
+                    keys.forEach(key => {
+                        if (commandMap[key] && !commands.some(cmd => cmd.key === key && cmd.section === sectionName)) {
+                           commands.push({
+                               key: key,
+                               label: descriptions[key] || `Изпълнява команда: ${commandMap[key]}`,
+                               section: sectionName,
+                           });
+                        }
+                    });
+                }
             }
         });
+        
         return { commands, sections };
     }
+
 
     function displayCommands(commands, sections) {
         const container = document.getElementById('commands-container');
@@ -116,7 +148,9 @@ document.addEventListener('DOMContentLoaded', () => {
         container.innerHTML = '';
         sectionSelect.innerHTML = '<option value="" disabled selected>Избери секция...</option>';
 
-        sections.forEach(section => {
+        const sectionsWithCommands = sections.filter(section => commands.some(cmd => cmd.section === section));
+
+        sectionsWithCommands.forEach(section => {
             const sectionDiv = document.createElement('div');
             sectionDiv.className = 'command-section';
             
@@ -125,70 +159,83 @@ document.addEventListener('DOMContentLoaded', () => {
             sectionDiv.appendChild(sectionTitle);
 
             const sectionOption = document.createElement('option');
-            sectionOption.value = section;
+            sectionOption.value = section.toUpperCase(); // Изпращаме името с главни букви
             sectionOption.textContent = section;
             sectionSelect.appendChild(sectionOption);
-
+            
             const commandsInSection = commands.filter(cmd => cmd.section === section);
-            if (commandsInSection.length > 0) {
-                commandsInSection.forEach(cmd => {
-                    const entryDiv = document.createElement('div');
-                    entryDiv.className = 'command-entry';
-                    entryDiv.innerHTML = `<code>${cmd.key}</code><p>${cmd.label}</p>`;
-                    sectionDiv.appendChild(entryDiv);
+            commandsInSection.forEach(cmd => {
+                const entryDiv = document.createElement('div');
+                entryDiv.className = 'command-entry';
+                
+                const copyBtn = document.createElement('button');
+                copyBtn.textContent = 'Копирай';
+                copyBtn.className = 'copy-btn';
+                copyBtn.title = 'Копирай командата в клипборда';
+                copyBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(cmd.key);
+                    updateStatus(`Командата "${cmd.key}" е копирана!`, 'success');
                 });
-            } else {
-                 sectionDiv.innerHTML += '<p>Няма команди в тази секция.</p>';
-            }
+
+                entryDiv.innerHTML = `<code>${cmd.key}</code><p>${cmd.label}</p>`;
+                entryDiv.prepend(copyBtn);
+                sectionDiv.appendChild(entryDiv);
+            });
             container.appendChild(sectionDiv);
         });
     }
 
-    function addNewCommandToContent(originalContent, newCommand) {
-        const sectionMarker = `;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  HELP ${newCommand.section}`;
-        const lines = originalContent.split('\n');
-        
-        let sectionStartIndex = lines.findIndex(line => line.includes(sectionMarker));
-        if (sectionStartIndex === -1) {
-            updateStatus(`Не е намерена секция: ${newCommand.section}`, 'error');
-            return originalContent;
-        }
+    // MAP за преобразуване на имената на секциите
+    const sectionToKeyMap = {
+        "SITUACIA": "SITUACIA",
+        "NAPRECHNI": "NAPRECHNI",
+        "NADLAZHNI": "NADLAZHNI",
+        "BLOKOVE": "BLOKOVE",
+        "LAYOUTS": "LAYOUTS",
+        "DRUGI": "DRUGI",
+        "CIVIL": "CIVIL",
+        "REGISTRI": "REGISTRI"
+    };
 
-        let sectionEndIndex = lines.findIndex((line, index) => index > sectionStartIndex && line.trim() === '}');
-        if(sectionEndIndex === -1){
-            updateStatus(`Не може да се намери края на DCL за секция: ${newCommand.section}`, 'error');
-            return originalContent;
-        }
+    function addNewCommandToContent(originalContent, newCommand) {
+        let lines = originalContent.split('\n');
         
-        const newCommandDCL = `
-"/////////////////////////////////////////////////////////////"
-"/////////////////////////// ${newCommand.key}.lsp //////////////////////////"
-"///////////////////////////////////////////////////////////// "
-": row {"
-"fixed_width = true;"
-"alignment = left;"
-"      : button {"
-"width = 14;"
-"fixed_width = true;"
-"        key = \\"${newCommand.key}\\";"
-"        label = \\"   ${newCommand.key}  \\";"
-"		is_default = false;"
-"fixed_width=true;"
-"      }"
-": row {"
-"fixed_width = true;"
-"      : text_part {"
-"        label = \\"${newCommand.label}\\";"
-"fixed_width_font=true;"
-"fixed_width=true;"
-"height = 1;"
-"alignment = centered;"
-"      }"
-"    }"
-""
-"}"
-`;
-        lines.splice(sectionEndIndex - 2, 0, newCommandDCL);
+        // --- 1. Добавяне в *command-map* ---
+        const commandMapEndMarker = ';;; END COMMAND MAP';
+        let commandMapEndIndex = lines.findIndex(line => line.includes(commandMapEndMarker));
+        if (commandMapEndIndex === -1) { updateStatus("Грешка: Не е намерен маркер COMMAND_MAP_END.", 'error'); return originalContent; }
+        const newCommandMapEntry = `    ("${newCommand.key}" . "${newCommand.key}")`;
+        lines.splice(commandMapEndIndex, 0, newCommandMapEntry);
+
+        // --- 2. Добавяне в списъка с ключове за секцията ---
+        const sectionKeyName = sectionToKeyMap[newCommand.section.toUpperCase()];
+        if (!sectionKeyName) { updateStatus(`Грешка: Невалидна секция ${newCommand.section}`, 'error'); return originalContent; }
+        const sectionKeysEndMarker = `;;; END ${sectionKeyName} KEYS`;
+        let sectionKeysEndIndex = lines.findIndex(line => line.includes(sectionKeysEndMarker));
+        if (sectionKeysEndIndex === -1) { updateStatus(`Грешка: Не е намерен маркер за ключове: ${sectionKeysEndMarker}`, 'error'); return originalContent; }
+        
+        let targetLineIndex = sectionKeysEndIndex -1;
+        let lineToModify = lines[targetLineIndex];
+        let closingParenIndex = lineToModify.lastIndexOf(')');
+        let keyToInsert = ` \"${newCommand.key}\"`;
+        lines[targetLineIndex] = lineToModify.substring(0, closingParenIndex) + keyToInsert + lineToModify.substring(closingParenIndex);
+
+        // --- 3. Добавяне на DCL ред ---
+        const dclSectionMarker = `;;;;;;;; HELP_SECTION: ${newCommand.section.toUpperCase()} ;;;;;;;;;;`;
+        let dclSectionIndex = lines.findIndex(line => line.includes(dclSectionMarker));
+        if (dclSectionIndex === -1) { updateStatus(`Грешка: Не е намерен маркер за DCL секция: ${dclSectionMarker}`, 'error'); return originalContent; }
+        
+        const dclEndMarker = ';;;;;;;; DCL_END ;;;;;;;;;;';
+        let dclEndIndex = -1;
+        for (let i = dclSectionIndex; i < lines.length; i++) {
+            if (lines[i].includes(dclEndMarker)) { dclEndIndex = i; break; }
+        }
+        if (dclEndIndex === -1) { updateStatus(`Грешка: Не е намерен DCL_END маркер за секция: ${newCommand.section}`, 'error'); return originalContent; }
+
+        const newDclRow = `": row { : button {key = \\"${newCommand.key}\\"; label = \\"${newCommand.key}\\"; width = 14; fixed_width = true;} : text_part {label = \\"  - ${newCommand.label}\\";}}"`;
+        let dclInsertIndex = dclEndIndex - 1; 
+        lines.splice(dclInsertIndex, 0, newDclRow);
+
         return lines.join('\n');
     }
     
@@ -196,60 +243,35 @@ document.addEventListener('DOMContentLoaded', () => {
         const statusDiv = document.getElementById('status-message');
         statusDiv.textContent = message;
         statusDiv.className = `status-${type}`;
+        statusDiv.style.display = 'block';
         setTimeout(() => {
             statusDiv.textContent = '';
             statusDiv.className = '';
+            statusDiv.style.display = 'none';
         }, 5000);
     }
     
     // --- Събития ---
     
-    // !!!!! ТУК Е ПРОМЯНАТА !!!!!
     loadBtn.addEventListener('click', async () => {
-        console.log("Бутонът е натиснат!");
+        GITHUB_USER = document.getElementById('githubUser').value.trim();
+        GITHUB_REPO = document.getElementById('githubRepo').value.trim();
+        FILE_PATH = document.getElementById('filePath').value.trim();
+        GITHUB_PAT = document.getElementById('githubPat').value.trim();
 
-        try {
-            console.log("1. Прочитане на githubUser...");
-            GITHUB_USER = document.getElementById('githubUser').value.trim();
-            console.log(" -> Успешно: " + GITHUB_USER);
-
-            console.log("2. Прочитане на githubRepo...");
-            GITHUB_REPO = document.getElementById('githubRepo').value.trim();
-            console.log(" -> Успешно: " + GITHUB_REPO);
-            
-            console.log("3. Прочитане на filePath...");
-            FILE_PATH = document.getElementById('filePath').value.trim();
-            console.log(" -> Успешно: " + FILE_PATH);
-
-            console.log("4. Прочитане на githubPat...");
-            GITHUB_PAT = document.getElementById('githubPat').value.trim();
-            console.log(" -> Успешно (дължина на токена): " + GITHUB_PAT.length);
-
-            if (!GITHUB_USER || !GITHUB_REPO || !FILE_PATH || !GITHUB_PAT) {
-                updateStatus('Моля, попълнете всички полета за настройка.', 'error');
-                console.log("Проверката за празни полета не мина.");
-                return;
-            }
-            
-            console.log("5. Всички полета са прочетени. Показване на съдържанието...");
-            appContent.classList.remove('hidden');
-            document.getElementById('commands-container').innerHTML = '<p class="loading">Зареждане...</p>';
-            
-            console.log("6. Извикване на getFileContent...");
-            const fileData = await getFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT);
-            
-            console.log("7. getFileContent приключи. Проверка на данните...");
-            if (fileData) {
-                console.log(" -> Има данни. Извикване на parseLispContent...");
-                const { commands, sections } = parseLispContent(fileData.content);
-                console.log(" -> Парсването приключи. Извикване на displayCommands...");
-                displayCommands(commands, sections);
-            } else {
-                 console.log(" -> Няма данни. getFileContent е върнал null.");
-            }
-        } catch (e) {
-            console.error("ВЪЗНИКНА КРИТИЧНА ГРЕШКА:", e);
-            updateStatus("Възникна критична грешка, проверете конзолата (F12)!", 'error');
+        if (!GITHUB_USER || !GITHUB_REPO || !FILE_PATH || !GITHUB_PAT) {
+            updateStatus('Моля, попълнете всички полета за настройка.', 'error');
+            return;
+        }
+        
+        appContent.classList.remove('hidden');
+        document.getElementById('commands-container').innerHTML = '<p class="loading">Зареждане...</p>';
+        
+        const fileData = await getFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT);
+        
+        if (fileData) {
+            const { commands, sections } = parseLispContent(fileData.content);
+            displayCommands(commands, sections);
         }
     });
 
@@ -280,11 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (result) {
             addCommandForm.reset();
-            const updatedFileData = await getFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT);
-             if (updatedFileData) {
-                const { commands, sections } = parseLispContent(updatedFileData.content);
-                displayCommands(commands, sections);
-            }
+            loadBtn.click(); // Симулираме клик, за да презаредим всичко
         }
     });
 });
