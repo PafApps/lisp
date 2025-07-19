@@ -49,13 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Парсване и Визуализация ---
-   function parseLispContent(content) {
-        console.log("parseLispContent: Започвам парсване на съдържанието...");
+    function parseLispContent(content) {
+        console.log("parseLispContent: Започвам парсване...");
         const commands = [];
         const sections = [];
         const lines = content.split('\n');
         
-        const sectionRegex = /;;; START (.*) KEYS/; 
+        const sectionRegex = /;;; START (.*) KEYS/;
         const commandMapRegex = /\("([^"]+)"\s+\.\s+"([^"]+)"\)/;
         const dclLabelRegex = /label = "([^"]*)"/; 
         const dclKeyRegex = /key = "([^"]+)"/;
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (match) commandMap[match[1]] = match[2];
             }
         });
-        console.log("parseLispContent: Намерени команди в *command-map*:", Object.keys(commandMap).length);
+        console.log(`Намерени ${Object.keys(commandMap).length} команди в *command-map*`);
         
         let descriptions = {};
         let currentDclKey = null;
@@ -89,42 +89,55 @@ document.addEventListener('DOMContentLoaded', () => {
                  }
             }
         });
-        console.log("parseLispContent: Извлечени описания от DCL:", Object.keys(descriptions).length);
+        console.log(`Извлечени ${Object.keys(descriptions).length} описания от DCL`);
 
-        lines.forEach(line => {
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
             const sectionMatch = line.match(sectionRegex);
             if (sectionMatch && sectionMatch[1]) {
                 const sectionNameRaw = sectionMatch[1].trim();
-                const sectionName = sectionNameRaw.charAt(0) + sectionNameRaw.slice(1).toLowerCase();
+                const sectionName = sectionNameRaw.charAt(0).toUpperCase() + sectionNameRaw.slice(1).toLowerCase();
                 if (!sections.includes(sectionName)) {
-                    console.log(`parseLispContent: Намерена нова секция: ${sectionName}`);
+                    console.log(`Намерена нова секция: ${sectionName}`);
                     sections.push(sectionName);
                 }
 
-                // !!!!! КОРЕКЦИЯ ТУК !!!!!
-                // Този Regex е прост и търси само кавички.
-                const keys = line.match(/"[^"]+"/g);
-                
-                if (keys) {
-                    const cleanedKeys = keys.map(k => k.replace(/"/g, ''));
-                    console.log(`parseLispContent: Намерени ${cleanedKeys.length} ключа за секция ${sectionName}`);
-                    cleanedKeys.forEach(key => {
-                        if (commandMap[key] && !commands.some(cmd => cmd.key === key)) {
-                           commands.push({
-                               key: key,
-                               label: descriptions[key] || `Изпълнява: ${commandMap[key]}`,
-                               section: sectionName,
-                           });
-                        }
-                    });
+                const nextLine = lines[i + 1]; // Гледаме следващия ред за ключовете
+                if (nextLine) {
+                    const keys = nextLine.match(/"[^"]+"/g);
+                    if (keys) {
+                        const cleanedKeys = keys.map(k => k.replace(/"/g, ''));
+                        console.log(`Намерени ${cleanedKeys.length} ключа за секция ${sectionName}`);
+                        cleanedKeys.forEach(key => {
+                            if (commandMap[key] && !commands.some(cmd => cmd.key === key && cmd.section === sectionName)) {
+                               commands.push({
+                                   key: key,
+                                   label: descriptions[key] || `Изпълнява: ${commandMap[key]}`,
+                                   section: sectionName,
+                               });
+                            }
+                        });
+                    }
                 }
             }
-        });
+        }
         
-        console.log(`parseLispContent: Парсването приключи. Общо намерени команди: ${commands.length}, Общо секции: ${sections.length}`);
+        console.log(`Парсването приключи. Общо намерени команди: ${commands.length}, Общо секции: ${sections.length}`);
         return { commands, sections };
     }
 
+
+    const sectionToCyrillic = {
+        "Main": "Раздели",
+        "Situacia": "Ситуация",
+        "Naprechni": "Напречни",
+        "Nadlazhni": "Надлъжни",
+        "Blokove": "Блокове",
+        "Layouts": "Лейаути",
+        "Drugi": "Други",
+        "Civil": "Civil",
+        "Registri": "Регистри"
+    };
 
     function displayCommands(commands, sections) {
         const container = document.getElementById('commands-container');
@@ -136,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sectionsForDropdown.forEach(section => {
             const sectionOption = document.createElement('option');
             sectionOption.value = section.toUpperCase();
-            sectionOption.textContent = section;
+            sectionOption.textContent = sectionToCyrillic[section] || section;
             sectionSelect.appendChild(sectionOption);
         });
 
@@ -145,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sectionsWithCommands.forEach(section => {
             const details = document.createElement('details');
             const summary = document.createElement('summary');
-            summary.textContent = section;
+            summary.textContent = sectionToCyrillic[section] || section;
             details.appendChild(summary);
             
             const commandsInSection = commands.filter(cmd => cmd.section === section);
@@ -181,10 +194,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const sectionKeyName = (sectionToKeyMap[newCommand.section.toUpperCase()] || newCommand.section.toUpperCase());
         const sectionKeysEndMarker = `;;; END ${sectionKeyName} KEYS`;
-        let sectionKeysEndIndex = lines.findIndex(line => line.includes(sectionKeysEndMarker));
-        if (sectionKeysEndIndex === -1) { updateStatus(`Грешка: Не е намерен маркер за ключове: ${sectionKeysEndMarker}`, 'error'); return originalContent; }
+        let sectionKeysIndex = lines.findIndex(line => line.includes(sectionKeysEndMarker));
+        if (sectionKeysIndex === -1) { updateStatus(`Грешка: Не е намерен маркер за ключове: ${sectionKeysEndMarker}`, 'error'); return originalContent; }
         
-        let targetLineIndex = sectionKeysEndIndex - 1;
+        let targetLineIndex = sectionKeysIndex; // We insert before this line
         let lineToModify = lines[targetLineIndex];
         let closingParenIndex = lineToModify.lastIndexOf(')');
         let keyToInsert = ` \"${newCommand.key}\"`;
@@ -225,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadBtn.addEventListener('click', async () => {
         console.clear();
         console.log("=====================================");
-        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАfНЕ");
+        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ");
         console.log("=====================================");
         
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
