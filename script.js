@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sectionToKeyMap = { "MAIN": "MAIN", "SITUACIA": "SITUACIA", "NAPRECHNI": "NAPRECHNI", "NADLAZHNI": "NADLAZHNI", "BLOKOVE": "BLOKOVE", "LAYOUTS": "LAYOUTS", "DRUGI": "DRUGI", "CIVIL": "CIVIL", "REGISTRI": "REGISTRI" };
     const keyToLispFuncMap = { "SITUACIA": "СИТУАЦИЯ", "NAPRECHNI": "НАПРЕЧНИ", "NADLAZHNI": "НАДЛЪЖНИ", "BLOKOVE": "БЛОКОВЕ", "LAYOUTS": "ЛЕЙАУТИ", "DRUGI": "ДРУГИ", "CIVIL": "СИВИЛ", "REGISTRI": "РЕГИСТРИ" };
 
-        function addNewCommandToContent(originalContent, newCommand) {
+    function addNewCommandToContent(originalContent, newCommand) {
         let lines = originalContent.split('\n');
         
         // 1. Добавяне в *command-map*
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
         lines.splice(commandMapEndIndex, 0, newCommandMapEntry);
         console.log(`Добавен запис в *command-map* за '${newCommand.key}'`);
 
-        // 2. Добавяне в списъка с ключове на секцията
+        // 2. Добавяне в списъка с ключове на секцията (КОРИГИРАНА ЛОГИКА)
         const sectionKeyName = sectionToKeyMap[newCommand.section.toUpperCase()];
         if (!sectionKeyName) {
             updateStatus(`Грешка: Невалидна секция '${newCommand.section}'`, 'error');
@@ -220,13 +220,22 @@ document.addEventListener('DOMContentLoaded', () => {
             updateStatus(`Грешка: Не е намерен списък с ключове за секция: ${sectionKeyName}`, 'error');
             return originalContent;
         }
+
         let lineToModify = lines[sectionKeysLineIndex];
         const backMarker = '"back"';
         const backIndex = lineToModify.lastIndexOf(backMarker);
+
         if (backIndex > -1) {
+            // === КОРЕКЦИЯТА Е ТУК ===
+            // 1. Дефинираме 'beginning' - частта преди "back"
             const beginning = lineToModify.substring(0, backIndex);
+            // 2. Дефинираме 'end' - частта от "back" до края
+            const end = lineToModify.substring(backIndex);
+            // 3. Създаваме новия ключ, който ще вмъкнем
             const keyToInsert = `"${newCommand.key}" `;
-            lines[sectionKeysLineIndex] = beginning + keyToInsert + beginning.trim() ? end : ` ${end}`;
+            // 4. Сглобяваме новия ред правилно
+            lines[sectionKeysLineIndex] = beginning + keyToInsert + end;
+            // =========================
             console.log(`Добавен ключ '${newCommand.key}' в *${sectionKeyName.toLowerCase()}-command-keys*`);
         } else {
            updateStatus(`Грешка: Не може да се намери маркерът "back" за вмъкване на ключ в: ${sectionKeyName}`, 'error');
@@ -255,11 +264,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if (commandItemsEndIndex > -1) {
-            // === КОРЕКЦИЯТА Е ТУК ===
             const keyForLabel = `   ${newCommand.key}  `;
-            // Премахнати са излишните кавички около променливите
             const newLispEntry = `      ("${newCommand.key}" "${keyForLabel}" "  - ${newCommand.label}")`;
-            // =========================
             lines.splice(commandItemsEndIndex, 0, newLispEntry);
             console.log(`Добавен запис в 'command_items' за секция '${lispFuncName}'`);
         } else {
@@ -287,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadBtn.addEventListener('click', async () => {
         console.clear();
         console.log("=====================================");
-        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕrrrrrrr");
+        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ");
         console.log("=====================================");
         
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
