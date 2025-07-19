@@ -57,12 +57,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const sectionRegex = /;;; START (.*?) KEYS/;
         const commandMapRegex = /\("([^"]+)"\s+\.\s+"([^"]+)"\)/;
-        const dclLabelRegex = /label = "([^"]*)"/; 
-        const dclKeyRegex = /key = "([^"]+)"/;
-
+        
+        // 1. Извличане на commandMap (ключ -> команда)
         let commandMap = {};
         let inCommandMap = false;
-
         lines.forEach(line => {
             if (line.includes(';;; START COMMAND MAP')) inCommandMap = true;
             if (line.includes(';;; END COMMAND MAP')) inCommandMap = false;
@@ -73,30 +71,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         console.log(`Намерени ${Object.keys(commandMap).length} команди в *command-map*`);
         
+        // 2. Извличане на всички описания от Lisp списъците (command_items)
         let descriptions = {};
-        let inDclBlock = false;
-        let lastKeyFound = null;
-
+        let inItemsList = false;
+        const commandItemRegex = /\(\s*"([^"]+)"\s+"[^"]*"\s+"([^"]*)"\)/;
         lines.forEach(line => {
-            if(line.includes(";;;;;;;; DCL_START ;;;;;;;;")) inDclBlock = true;
-            if(line.includes(";;;;;;;; DCL_END ;;;;;;;;;;")) inDclBlock = false;
-
-            if(inDclBlock) {
-                const keyMatch = line.match(dclKeyRegex);
-                if (keyMatch) {
-                    lastKeyFound = keyMatch[1];
-                }
-
-                const labelMatch = line.match(/label = "  - ([^"]*)"/);
-                if (labelMatch && lastKeyFound) {
-                    descriptions[lastKeyFound] = labelMatch[1].replace(/\\"/g, '"').trim();
-                    console.log(`Намерено описание за '${lastKeyFound}': ${descriptions[lastKeyFound]}`);
-                    lastKeyFound = null; // Нулираме, за да търсим следващ ключ
+            if (line.includes('(setq command_items') || line.includes('(setq menu_items')) {
+                inItemsList = true;
+            }
+            if (inItemsList && line.trim() === ")") {
+                inItemsList = false;
+            }
+            if (inItemsList) {
+                const match = line.match(commandItemRegex);
+                if (match) {
+                    const key = match[1].trim();
+                    const desc = match[2].trim().replace(/^-\s*/, '');
+                    if (key && desc && key !== "---") {
+                        descriptions[key] = desc;
+                    }
                 }
             }
         });
-        console.log(`Извлечени ${Object.keys(descriptions).length} описания от DCL`);
+        console.log(`Извлечени ${Object.keys(descriptions).length} описания от 'command_items' списъци.`);
 
+        // 3. Обхождане на секциите и конструиране на крайния списък
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             const sectionMatch = line.match(sectionRegex);
@@ -108,14 +107,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     sections.push(sectionName);
                 }
                 
-                const nextLine = lines[i + 1];
-                if (nextLine) {
-                    const keys = nextLine.match(/"[^"]+"/g);
+                let keysLine = '';
+                for (let j = i; j < lines.length; j++) {
+                    if (lines[j].includes(';;; END ' + sectionNameRaw)) break;
+                    if (lines[j].trim().startsWith('(setq')) {
+                        keysLine = lines[j];
+                        break;
+                    }
+                }
+
+                if (keysLine) {
+                    const keys = keysLine.match(/"[^"]+"/g);
                     if (keys) {
                         const cleanedKeys = keys.map(k => k.replace(/"/g, ''));
                         console.log(`Намерени ${cleanedKeys.length} ключа за секция ${sectionName}`);
                         cleanedKeys.forEach(key => {
-                            if (commandMap[key] && !commands.some(cmd => cmd.key === key && cmd.section === sectionName)) {
+                            if (commandMap[key] && !commands.some(cmd => cmd.key === key)) {
                                commands.push({
                                    key: key,
                                    label: descriptions[key] || `Изпълнява: ${commandMap[key]}`,
@@ -131,7 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(`Парсването приключи. Общо намерени команди: ${commands.length}, Общо секции: ${sections.length}`);
         return { commands, sections, commandMap };
     }
-
 
     const sectionToCyrillic = {
         "Main": "Раздели",
@@ -163,6 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         sectionsWithCommands.forEach(section => {
             const details = document.createElement('details');
+            details.open = true; // Open by default
             const summary = document.createElement('summary');
             summary.textContent = sectionToCyrillic[section] || section;
             details.appendChild(summary);
@@ -187,42 +194,69 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const sectionToKeyMap = { "MAIN": "MAIN", "SITUACIA": "SITUACIA", "NAPRECHNI": "NAPRECHNI", "NADLAZHNI": "NADLAZHNI", "BLOKOVE": "BLOKOVE", "LAYOUTS": "LAYOUTS", "DRUGI": "DRUGI", "CIVIL": "CIVIL", "РЕГИСТРИ": "REGISTRI" };
+    const sectionToKeyMap = { "MAIN": "MAIN", "SITUACIA": "SITUACIA", "NAPRECHNI": "NAPRECHNI", "NADLAZHNI": "NADLAZHNI", "BLOKOVE": "BLOKOVE", "LAYOUTS": "LAYOUTS", "DRUGI": "DRUGI", "CIVIL": "CIVIL", "REGISTRI": "REGISTRI" };
+    const keyToLispFuncMap = { "SITUACIA": "СИТУАЦИЯ", "NAPRECHNI": "НАПРЕЧНИ", "NADLAZHNI": "НАДЛЪЖНИ", "BLOKOVE": "БЛОКОВЕ", "LAYOUTS": "ЛЕЙАУТИ", "DRUGI": "ДРУГИ", "CIVIL": "СИВИЛ", "REGISTRI": "РЕГИСТРИ" };
 
     function addNewCommandToContent(originalContent, newCommand) {
         let lines = originalContent.split('\n');
         
+        // 1. Добавяне в *command-map*
         const commandMapEndMarker = ';;; END COMMAND MAP';
         let commandMapEndIndex = lines.findIndex(line => line.includes(commandMapEndMarker));
-        if (commandMapEndIndex === -1) { updateStatus("Грешка: Не е намерен маркер COMMAND_MAP_END.", 'error'); return originalContent; }
+        if (commandMapEndIndex === -1) { updateStatus("Грешка: Не е намерен маркер ;;; END COMMAND MAP.", 'error'); return originalContent; }
         const newCommandMapEntry = `    ("${newCommand.key}" . "${newCommand.key}")`;
         lines.splice(commandMapEndIndex, 0, newCommandMapEntry);
+        console.log(`Добавен запис в *command-map* за '${newCommand.key}'`);
 
-        const sectionKeyName = (sectionToKeyMap[newCommand.section.toUpperCase()] || newCommand.section.toUpperCase());
-        const sectionKeysEndMarker = `;;; END ${sectionKeyName} KEYS`;
-        let sectionKeysIndex = lines.findIndex(line => line.includes(sectionKeysEndMarker));
-        if (sectionKeysIndex === -1) { updateStatus(`Грешка: Не е намерен маркер за ключове: ${sectionKeysEndMarker}`, 'error'); return originalContent; }
+        // 2. Добавяне в списъка с ключове на секцията
+        const sectionKeyName = sectionToKeyMap[newCommand.section.toUpperCase()];
+        const sectionKeysStartMarker = `(setq *${sectionKeyName.toLowerCase()}-command-keys*`;
+        let sectionKeysLineIndex = lines.findIndex(line => line.includes(sectionKeysStartMarker));
+        if (sectionKeysLineIndex === -1) { updateStatus(`Грешка: Не е намерен списък с ключове за секция: ${sectionKeyName}`, 'error'); return originalContent; }
         
-        let targetLineIndex = sectionKeysIndex;
-        let lineToModify = lines[targetLineIndex];
+        let lineToModify = lines[sectionKeysLineIndex];
         let closingParenIndex = lineToModify.lastIndexOf(')');
-        let keyToInsert = ` \"${newCommand.key}\"`;
-        lines[targetLineIndex] = lineToModify.substring(0, closingParenIndex) + keyToInsert + lineToModify.substring(closingParenIndex);
-
-        const dclSectionMarker = `;;;;;;;; HELP_SECTION: ${newCommand.section.toUpperCase()}`;
-        let dclSectionIndex = lines.findIndex(line => line.includes(dclSectionMarker));
-        if (dclSectionIndex === -1) { updateStatus(`Грешка: Не е намерен маркер за DCL секция: ${dclSectionMarker}`, 'error'); return originalContent; }
-        
-        const dclEndMarker = ';;;;;;;; DCL_END ;;;;;;;;;;';
-        let dclEndIndex = -1;
-        for (let i = dclSectionIndex; i < lines.length; i++) {
-            if (lines[i].includes(dclEndMarker)) { dclEndIndex = i; break; }
+        let keyToInsert = ` "${newCommand.key}"`;
+        // Намиране на последния ключ (напр. "back") и вмъкване преди него
+        const lastKeyMatch = lineToModify.match(/"([^"]+)"\s*\)\s*$/);
+        if (lastKeyMatch) {
+             let insertIndex = lineToModify.lastIndexOf(lastKeyMatch[0]);
+             lines[sectionKeysLineIndex] = lineToModify.substring(0, insertIndex) + keyToInsert + " " + lineToModify.substring(insertIndex);
+             console.log(`Добавен ключ '${newCommand.key}' в *${sectionKeyName.toLowerCase()}-command-keys*`);
+        } else {
+            updateStatus(`Грешка: Не може да се модифицира редът с ключове за ${sectionKeyName}`, 'error'); return originalContent;
         }
-        if (dclEndIndex === -1) { updateStatus(`Грешка: Не е намерен DCL_END маркер за секция: ${newCommand.section}`, 'error'); return originalContent; }
 
-        const newDclRow = `": row { : button {key = \\"${newCommand.key}\\"; label = \\"${newCommand.key}\\"; width = 14; fixed_width = true;} : text_part {label = \\"  - ${newCommand.label}\\";}}"`;
-        let dclInsertIndex = dclEndIndex - 1; 
-        lines.splice(dclInsertIndex, 0, newDclRow);
+        // 3. Добавяне в `command_items` на съответната Lisp функция
+        const lispFuncName = keyToLispFuncMap[newCommand.section.toUpperCase()];
+        if (!lispFuncName) { updateStatus(`Грешка: Няма дефинирана Lisp функция за секция '${newCommand.section}'`, 'error'); return originalContent; }
+        
+        const functionStartMarker = `defun create_dclhelplisp${lispFuncName}`;
+        let functionStartIndex = lines.findIndex(line => line.includes(functionStartMarker));
+        if (functionStartIndex === -1) { updateStatus(`Грешка: Не е намерена Lisp функция: ${functionStartMarker}`, 'error'); return originalContent; }
+        
+        let commandItemsEndIndex = -1;
+        let inItems = false;
+        for (let i = functionStartIndex; i < lines.length; i++) {
+            if (lines[i].includes('(setq command_items')) {
+                inItems = true;
+                continue;
+            }
+            if (inItems && lines[i].trim() === ')') {
+                commandItemsEndIndex = i;
+                break;
+            }
+        }
+        
+        if (commandItemsEndIndex > -1) {
+            const paddedKey = newCommand.key.padStart(newCommand.key.length + 3, ' ').padEnd(newCommand.key.length + 5, ' ');
+            const newLispEntry = `      ("${newCommand.key}" "${paddedKey}" "  - ${newCommand.label}")`;
+            lines.splice(commandItemsEndIndex, 0, newLispEntry);
+            console.log(`Добавен запис в 'command_items' за секция '${lispFuncName}'`);
+        } else {
+            updateStatus(`Грешка: Не може да се намери краят на 'command_items' за секция '${lispFuncName}'`, 'error');
+            return originalContent;
+        }
 
         return lines.join('\n');
     }
@@ -244,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadBtn.addEventListener('click', async () => {
         console.clear();
         console.log("=====================================");
-        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ");
+        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ55555555");
         console.log("=====================================");
         
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
@@ -287,19 +321,24 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        updateStatus('Обработка... Моля, изчакайте.', 'success');
+        updateStatus('Обработка... Моля, изчакайте.', 'info');
 
         const fileData = await getFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT);
         if (!fileData) return;
 
         const newContent = addNewCommandToContent(fileData.content, newCommand);
-        if (newContent === fileData.content) return; 
+        if (newContent === fileData.content) {
+            console.error("Съдържанието на файла не е променено. Вероятна грешка в логиката за добавяне.");
+            updateStatus('Грешка: Командата не можа да бъде добавена.', 'error');
+            return;
+        }
 
         const commitMessage = `Добавена е нова команда: ${newCommand.key}`;
         const result = await updateFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT, newContent, fileData.sha, commitMessage);
 
         if (result) {
             addCommandForm.reset();
+            // Автоматично презареждане на командите след успешна промяна
             loadBtn.click();
         }
     });
