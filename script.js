@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const sections = [];
         const lines = content.split('\n');
         
-        const sectionRegex = /;;; START (.*) KEYS/;
+        const sectionRegex = /;;; START (.*?) KEYS/;
         const commandMapRegex = /\("([^"]+)"\s+\.\s+"([^"]+)"\)/;
         const dclLabelRegex = /label = "([^"]*)"/; 
         const dclKeyRegex = /key = "([^"]+)"/;
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log(`Намерена нова секция: ${sectionName}`);
                     sections.push(sectionName);
                 }
-
+                
                 const nextLine = lines[i + 1]; // Гледаме следващия ред за ключовете
                 if (nextLine) {
                     const keys = nextLine.match(/"[^"]+"/g);
@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         console.log(`Парсването приключи. Общо намерени команди: ${commands.length}, Общо секции: ${sections.length}`);
-        return { commands, sections };
+        return { commands, sections, commandMap };
     }
 
 
@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "Registri": "Регистри"
     };
 
-    function displayCommands(commands, sections) {
+    function displayCommands(commands, sections, commandMap) {
         const container = document.getElementById('commands-container');
         const sectionSelect = document.getElementById('command-section');
         container.innerHTML = '';
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const sectionToKeyMap = { "MAIN": "MAIN", "SITUACIA": "SITUACIA", "NAPRECHNI": "NAPRECHNI", "NADLAZHNI": "NADLAZHNI", "BLOKOVE": "BLOKOVE", "LAYOUTS": "LAYOUTS", "DRUGI": "DRUGI", "CIVIL": "CIVIL", "REGISTRI": "REGISTRI" };
+    const sectionToKeyMap = { "MAIN": "MAIN", "SITUACIA": "SITUACIA", "NAPRECHNI": "NAPRECHNI", "NADLAZHNI": "NADLAZHNI", "BLOKOVE": "BLOKOVE", "LAYOUTS": "LAYOUTS", "DRUGI": "DRUGI", "CIVIL": "CIVIL", "РЕГИСТРИ": "REGISTRI" };
 
     function addNewCommandToContent(originalContent, newCommand) {
         let lines = originalContent.split('\n');
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let sectionKeysIndex = lines.findIndex(line => line.includes(sectionKeysEndMarker));
         if (sectionKeysIndex === -1) { updateStatus(`Грешка: Не е намерен маркер за ключове: ${sectionKeysEndMarker}`, 'error'); return originalContent; }
         
-        let targetLineIndex = sectionKeysIndex; // We insert before this line
+        let targetLineIndex = sectionKeysIndex; 
         let lineToModify = lines[targetLineIndex];
         let closingParenIndex = lineToModify.lastIndexOf(')');
         let keyToInsert = ` \"${newCommand.key}\"`;
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadBtn.addEventListener('click', async () => {
         console.clear();
         console.log("=====================================");
-        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ");
+        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ3");
         console.log("=====================================");
         
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
@@ -257,10 +257,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (fileData) {
             console.log("3. Данните са получени. Извикване на parseLispContent...");
-            const { commands, sections } = parseLispContent(fileData.content);
+            const { commands, sections, commandMap } = parseLispContent(fileData.content);
             
             console.log("4. Парсването приключи. Извикване на displayCommands...");
-            displayCommands(commands, sections);
+            displayCommands(commands, sections, commandMap);
             console.log("5. displayCommands приключи.");
         } else {
             console.error("6. getFileContent не върна данни. Процесът е прекратен.");
@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!fileData) return;
 
         const newContent = addNewCommandToContent(fileData.content, newCommand);
-        if (newContent === originalContent) return; 
+        if (newContent === fileData.content) return; 
 
         const commitMessage = `Добавена е нова команда: ${newCommand.key}`;
         const result = await updateFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT, newContent, fileData.sha, commitMessage);
