@@ -55,17 +55,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const sections = [];
         const lines = content.split('\n');
         
-        const sectionRegex = /;;;;;;;;;; HELP_SECTION: (.*) ;;;;;;;;;;/;
+        const sectionRegex = /;;; START (.*?) KEYS/;
+        const commandMapRegex = /\("([^"]+)"\s+\.\s+"([^"]+)"\)/;
+        const dclLabelRegex = /label = "([^"]*)"/; 
         const dclKeyRegex = /key = "([^"]+)"/;
-        const dclLabelRegex = /label = "  - ([^"]*)"/;
 
+        let commandMap = {};
+        let inCommandMap = false;
+
+        lines.forEach(line => {
+            if (line.includes(';;; START COMMAND MAP')) inCommandMap = true;
+            if (line.includes(';;; END COMMAND MAP')) inCommandMap = false;
+            if (inCommandMap) {
+                const match = line.match(commandMapRegex);
+                if (match) commandMap[match[1]] = match[2];
+            }
+        });
+        console.log(`Намерени ${Object.keys(commandMap).length} команди в *command-map*`);
+        
         let descriptions = {};
         let inDclBlock = false;
         let lastKeyFound = null;
 
-        // --- НОВ, ПО-НАДЕЖДЕН МЕТОД ЗА ИЗВЛИЧАНЕ НА ОПИСАНИЯ ---
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
+        lines.forEach(line => {
             if(line.includes(";;;;;;;; DCL_START ;;;;;;;;")) inDclBlock = true;
             if(line.includes(";;;;;;;; DCL_END ;;;;;;;;;;")) inDclBlock = false;
 
@@ -73,81 +85,87 @@ document.addEventListener('DOMContentLoaded', () => {
                 const keyMatch = line.match(dclKeyRegex);
                 if (keyMatch) {
                     lastKeyFound = keyMatch[1];
-                    // Търсим описанието на следващите няколко реда
-                    for (let j = i + 1; j < i + 5 && j < lines.length; j++) {
-                        const nextLine = lines[j];
-                        const labelMatch = nextLine.match(dclLabelRegex);
-                        if (labelMatch) {
-                            descriptions[lastKeyFound] = labelMatch[1].replace(/\\"/g, '"').trim();
-                            break; // Намерихме го, спираме вътрешния цикъл
-                        }
-                    }
+                }
+
+                const labelMatch = line.match(/label = "  - ([^"]*)"/);
+                if (labelMatch && lastKeyFound) {
+                    descriptions[lastKeyFound] = labelMatch[1].replace(/\\"/g, '"').trim();
+                    console.log(`Намерено описание за '${lastKeyFound}': ${descriptions[lastKeyFound]}`);
+                    lastKeyFound = null; // Нулираме, за да търсим следващ ключ
                 }
             }
-        }
+        });
         console.log(`Извлечени ${Object.keys(descriptions).length} описания от DCL`);
 
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             const sectionMatch = line.match(sectionRegex);
             if (sectionMatch && sectionMatch[1]) {
-                const sectionName = sectionMatch[1].trim();
+                const sectionNameRaw = sectionMatch[1].trim();
+                const sectionName = sectionNameRaw.charAt(0).toUpperCase() + sectionNameRaw.slice(1).toLowerCase();
                 if (!sections.includes(sectionName)) {
                     console.log(`Намерена нова секция: ${sectionName}`);
                     sections.push(sectionName);
                 }
                 
-                // Намираме съответната C: команда, за да вземем action_tile
-                for(let j = i; j < lines.length; j++){
-                    if(lines[j].startsWith(`(defun C:${sectionName}`)){
-                        let inLogicBlock = false;
-                        for(let k = j; k < lines.length; k++){
-                            if(lines[k].includes(";;;;;;;; LISP_LOGIC_START ;;;;;;;;;;")) inLogicBlock = true;
-                            if(lines[k].includes(";;;;;;;; LISP_LOGIC_END ;;;;;;;;;;")) break;
-
-                            if(inLogicBlock){
-                                const actionMatch = lines[k].match(/\(action_tile "([^"]+)"/);
-                                if(actionMatch){
-                                    const key = actionMatch[1];
-                                     if (!commands.some(cmd => cmd.key === key && cmd.section === sectionName)) {
-                                        commands.push({
-                                            key: key,
-                                            label: descriptions[key] || `Команда: ${key}`,
-                                            section: sectionName,
-                                        });
-                                     }
-                                }
+                const nextLine = lines[i + 1];
+                if (nextLine) {
+                    const keys = nextLine.match(/"[^"]+"/g);
+                    if (keys) {
+                        const cleanedKeys = keys.map(k => k.replace(/"/g, ''));
+                        console.log(`Намерени ${cleanedKeys.length} ключа за секция ${sectionName}`);
+                        cleanedKeys.forEach(key => {
+                            if (commandMap[key] && !commands.some(cmd => cmd.key === key && cmd.section === sectionName)) {
+                               commands.push({
+                                   key: key,
+                                   label: descriptions[key] || `Изпълнява: ${commandMap[key]}`,
+                                   section: sectionName,
+                               });
                             }
-                        }
-                        break;
+                        });
                     }
                 }
             }
         }
         
         console.log(`Парсването приключи. Общо намерени команди: ${commands.length}, Общо секции: ${sections.length}`);
-        return { commands, sections };
+        return { commands, sections, commandMap };
     }
 
 
-    function displayCommands(commands, sections) {
+    const sectionToCyrillic = {
+        "Main": "Раздели",
+        "Situacia": "Ситуация",
+        "Naprechni": "Напречни",
+        "Nadlazhni": "Надлъжни",
+        "Blokove": "Блокове",
+        "Layouts": "Лейаути",
+        "Drugi": "Други",
+        "Civil": "Civil",
+        "Registri": "Регистри"
+    };
+
+    function displayCommands(commands, sections, commandMap) {
         const container = document.getElementById('commands-container');
         const sectionSelect = document.getElementById('command-section');
         container.innerHTML = '';
         sectionSelect.innerHTML = '<option value="" disabled selected>Избери секция...</option>';
         
-        const sectionsWithCommands = sections.filter(section => commands.some(cmd => cmd.section === section));
+        const sectionsForDropdown = sections.filter(s => s.toLowerCase() !== 'main');
+        sectionsForDropdown.forEach(section => {
+            const sectionOption = document.createElement('option');
+            sectionOption.value = section.toUpperCase();
+            sectionOption.textContent = sectionToCyrillic[section] || section;
+            sectionSelect.appendChild(sectionOption);
+        });
 
+        const sectionsWithCommands = sections.filter(section => commands.some(cmd => cmd.section === section));
+        
         sectionsWithCommands.forEach(section => {
             const details = document.createElement('details');
             const summary = document.createElement('summary');
-            summary.textContent = section;
+            summary.textContent = sectionToCyrillic[section] || section;
             details.appendChild(summary);
-            
-            const sectionOption = document.createElement('option');
-            sectionOption.value = section;
-            sectionOption.textContent = section;
-            sectionSelect.appendChild(sectionOption);
             
             const commandsInSection = commands.filter(cmd => cmd.section === section);
             commandsInSection.forEach(cmd => {
@@ -156,10 +174,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const copyBtn = document.createElement('button');
                 copyBtn.textContent = 'Копирай';
                 copyBtn.className = 'copy-btn';
-                copyBtn.title = `Копирай "${cmd.key}"`;
+                copyBtn.title = `Копирай "${commandMap[cmd.key] || cmd.key}"`;
                 copyBtn.addEventListener('click', () => {
-                    navigator.clipboard.writeText(cmd.key);
-                    updateStatus(`Командата "${cmd.key}" е копирана!`, 'success');
+                    navigator.clipboard.writeText(commandMap[cmd.key] || cmd.key);
+                    updateStatus(`Командата "${commandMap[cmd.key] || cmd.key}" е копирана!`, 'success');
                 });
                 entryDiv.innerHTML = `<code>${cmd.key}</code><p>${cmd.label}</p>`;
                 entryDiv.prepend(copyBtn);
@@ -169,11 +187,44 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const sectionToKeyMap = { "MAIN": "MAIN", "SITUACIA": "SITUACIA", "NAPRECHNI": "NAPRECHNI", "NADLAZHNI": "NADLAZHNI", "BLOKOVE": "BLOKOVE", "LAYOUTS": "LAYOUTS", "DRUGI": "DRUGI", "CIVIL": "CIVIL", "РЕГИСТРИ": "REGISTRI" };
+
     function addNewCommandToContent(originalContent, newCommand) {
-        // ... (Тази функция е сложна и ще я добавя, след като потвърдим, че четенето работи)
-        // Засега връщаме оригиналното съдържание, за да не правим промени
-        updateStatus("Функцията за добавяне все още не е имплементирана.", "error");
-        return originalContent;
+        let lines = originalContent.split('\n');
+        
+        const commandMapEndMarker = ';;; END COMMAND MAP';
+        let commandMapEndIndex = lines.findIndex(line => line.includes(commandMapEndMarker));
+        if (commandMapEndIndex === -1) { updateStatus("Грешка: Не е намерен маркер COMMAND_MAP_END.", 'error'); return originalContent; }
+        const newCommandMapEntry = `    ("${newCommand.key}" . "${newCommand.key}")`;
+        lines.splice(commandMapEndIndex, 0, newCommandMapEntry);
+
+        const sectionKeyName = (sectionToKeyMap[newCommand.section.toUpperCase()] || newCommand.section.toUpperCase());
+        const sectionKeysEndMarker = `;;; END ${sectionKeyName} KEYS`;
+        let sectionKeysIndex = lines.findIndex(line => line.includes(sectionKeysEndMarker));
+        if (sectionKeysIndex === -1) { updateStatus(`Грешка: Не е намерен маркер за ключове: ${sectionKeysEndMarker}`, 'error'); return originalContent; }
+        
+        let targetLineIndex = sectionKeysIndex;
+        let lineToModify = lines[targetLineIndex];
+        let closingParenIndex = lineToModify.lastIndexOf(')');
+        let keyToInsert = ` \"${newCommand.key}\"`;
+        lines[targetLineIndex] = lineToModify.substring(0, closingParenIndex) + keyToInsert + lineToModify.substring(closingParenIndex);
+
+        const dclSectionMarker = `;;;;;;;; HELP_SECTION: ${newCommand.section.toUpperCase()}`;
+        let dclSectionIndex = lines.findIndex(line => line.includes(dclSectionMarker));
+        if (dclSectionIndex === -1) { updateStatus(`Грешка: Не е намерен маркер за DCL секция: ${dclSectionMarker}`, 'error'); return originalContent; }
+        
+        const dclEndMarker = ';;;;;;;; DCL_END ;;;;;;;;;;';
+        let dclEndIndex = -1;
+        for (let i = dclSectionIndex; i < lines.length; i++) {
+            if (lines[i].includes(dclEndMarker)) { dclEndIndex = i; break; }
+        }
+        if (dclEndIndex === -1) { updateStatus(`Грешка: Не е намерен DCL_END маркер за секция: ${newCommand.section}`, 'error'); return originalContent; }
+
+        const newDclRow = `": row { : button {key = \\"${newCommand.key}\\"; label = \\"${newCommand.key}\\"; width = 14; fixed_width = true;} : text_part {label = \\"  - ${newCommand.label}\\";}}"`;
+        let dclInsertIndex = dclEndIndex - 1; 
+        lines.splice(dclInsertIndex, 0, newDclRow);
+
+        return lines.join('\n');
     }
     
     function updateStatus(message, type) {
@@ -189,9 +240,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // --- Събития ---
+    
     loadBtn.addEventListener('click', async () => {
         console.clear();
+        console.log("=====================================");
         console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ");
+        console.log("=====================================");
         
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
         if (!GITHUB_PAT) {
@@ -199,20 +253,54 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
+        console.log(`1. Данни: User=${GITHUB_USER}, Repo=${GITHUB_REPO}, Path=${FILE_PATH}, Token(length)=${GITHUB_PAT.length}`);
+        
         appContent.classList.remove('hidden');
         document.getElementById('commands-container').innerHTML = '<p class="loading">Зареждане...</p>';
         
+        console.log("2. Извикване на getFileContent...");
         const fileData = await getFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT);
         
         if (fileData) {
-            const { commands, sections } = parseLispContent(fileData.content);
-            displayCommands(commands, sections);
+            console.log("3. Данните са получени. Извикване на parseLispContent...");
+            const { commands, sections, commandMap } = parseLispContent(fileData.content);
+            
+            console.log("4. Парсването приключи. Извикване на displayCommands...");
+            displayCommands(commands, sections, commandMap);
+            console.log("5. displayCommands приключи.");
+        } else {
+            console.error("6. getFileContent не върна данни. Процесът е прекратен.");
         }
     });
 
     addCommandForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        // ... (Логиката за добавяне ще бъде активирана по-късно)
-        updateStatus("Функцията за добавяне все още не е имплементирана.", "error");
+
+        const newCommand = {
+            section: document.getElementById('command-section').value,
+            key: document.getElementById('command-key').value.trim(),
+            label: document.getElementById('command-label').value.trim(),
+        };
+
+        if (!newCommand.section || !newCommand.key || !newCommand.label) {
+            updateStatus('Моля, попълнете всички полета за новата команда.', 'error');
+            return;
+        }
+
+        updateStatus('Обработка... Моля, изчакайте.', 'success');
+
+        const fileData = await getFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT);
+        if (!fileData) return;
+
+        const newContent = addNewCommandToContent(fileData.content, newCommand);
+        if (newContent === fileData.content) return; 
+
+        const commitMessage = `Добавена е нова команда: ${newCommand.key}`;
+        const result = await updateFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT, newContent, fileData.sha, commitMessage);
+
+        if (result) {
+            addCommandForm.reset();
+            loadBtn.click();
+        }
     });
 });
