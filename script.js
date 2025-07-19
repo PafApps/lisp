@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const sections = [];
         const lines = content.split('\n');
         
-        const sectionRegex = /;;; START (.*?) KEYS/;
+        const sectionRegex = /;;; START (.*) KEYS/;
         const commandMapRegex = /\("([^"]+)"\s+\.\s+"([^"]+)"\)/;
         const dclLabelRegex = /label = "([^"]*)"/; 
         const dclKeyRegex = /key = "([^"]+)"/;
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     sections.push(sectionName);
                 }
                 
-                const nextLine = lines[i + 1]; // Гледаме следващия ред за ключовете
+                const nextLine = lines[i + 1];
                 if (nextLine) {
                     const keys = nextLine.match(/"[^"]+"/g);
                     if (keys) {
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadBtn.addEventListener('click', async () => {
         console.clear();
         console.log("=====================================");
-        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ");
+        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ555");
         console.log("=====================================");
         
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
