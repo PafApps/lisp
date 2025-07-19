@@ -73,17 +73,24 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // !!!!! НОВ, ПО-НАДЕЖДЕН МЕТОД ЗА ИЗВЛИЧАНЕ НА ОПИСАНИЯ !!!!!
         let descriptions = {};
-        lines.forEach(line => {
-            // Търсим редове, които съдържат едновременно button и text_part
-            if (line.includes(': button {') && line.includes(': text_part {')) {
-                const keyMatch = line.match(/key = "([^"]+)"/);
-                // Този regex специално търси label, който започва с "  - ", което индикира описание
-                const labelMatch = line.match(/label = "  - ([^"]*)"/);
+        let inDclBlock = false;
+        let lastKeyFound = null;
 
-                if (keyMatch && keyMatch[1] && labelMatch && labelMatch[1]) {
-                    const key = keyMatch[1].trim();
-                    const desc = labelMatch[1].replace(/\\"/g, '"').trim(); // Обработваме ескейпнати кавички
-                    descriptions[key] = desc;
+        lines.forEach(line => {
+            if(line.includes(";;;;;;;; DCL_START ;;;;;;;;")) inDclBlock = true;
+            if(line.includes(";;;;;;;; DCL_END ;;;;;;;;;;")) inDclBlock = false;
+
+            if(inDclBlock) {
+                const keyMatch = line.match(/key = "([^"]+)"/);
+                if (keyMatch) {
+                    lastKeyFound = keyMatch[1];
+                }
+
+                const labelMatch = line.match(/label = "  - ([^"]*)"/);
+                if (labelMatch && lastKeyFound) {
+                    descriptions[lastKeyFound] = labelMatch[1].replace(/\\"/g, '"');
+                    console.log(`Намерено описание за '${lastKeyFound}': ${descriptions[lastKeyFound]}`);
+                    lastKeyFound = null; // Нулираме, за да търсим следващ ключ
                 }
             }
         });
@@ -96,7 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const sectionNameRaw = sectionMatch[1].trim();
                 const sectionName = sectionNameRaw.charAt(0).toUpperCase() + sectionNameRaw.slice(1).toLowerCase();
                 if (!sections.includes(sectionName)) {
-                    console.log(`Намерена нова секция: ${sectionName}`);
                     sections.push(sectionName);
                 }
                 
@@ -105,7 +111,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const keys = nextLine.match(/"[^"]+"/g);
                     if (keys) {
                         const cleanedKeys = keys.map(k => k.replace(/"/g, ''));
-                        console.log(`Намерени ${cleanedKeys.length} ключа за секция ${sectionName}`);
                         cleanedKeys.forEach(key => {
                             if (commandMap[key] && !commands.some(cmd => cmd.key === key && cmd.section === sectionName)) {
                                commands.push({
@@ -226,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadBtn.addEventListener('click', async () => {
         console.clear();
         console.log("=====================================");
-        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ");
+        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ55555555");
         console.log("=====================================");
         
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
