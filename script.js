@@ -208,23 +208,34 @@ document.addEventListener('DOMContentLoaded', () => {
         lines.splice(commandMapEndIndex, 0, newCommandMapEntry);
         console.log(`Добавен запис в *command-map* за '${newCommand.key}'`);
 
-        // 2. Добавяне в списъка с ключове на секцията
+        // 2. Добавяне в списъка с ключове на секцията (ПОДОБРЕНА ЛОГИКА)
         const sectionKeyName = sectionToKeyMap[newCommand.section.toUpperCase()];
+        if (!sectionKeyName) {
+            updateStatus(`Грешка: Невалидна секция '${newCommand.section}'`, 'error');
+            return originalContent;
+        }
+
         const sectionKeysStartMarker = `(setq *${sectionKeyName.toLowerCase()}-command-keys*`;
-        let sectionKeysLineIndex = lines.findIndex(line => line.includes(sectionKeysStartMarker));
-        if (sectionKeysLineIndex === -1) { updateStatus(`Грешка: Не е намерен списък с ключове за секция: ${sectionKeyName}`, 'error'); return originalContent; }
+        let sectionKeysLineIndex = lines.findIndex(line => line.trim().startsWith(sectionKeysStartMarker));
         
+        if (sectionKeysLineIndex === -1) {
+            updateStatus(`Грешка: Не е намерен списък с ключове за секция: ${sectionKeyName}`, 'error');
+            return originalContent;
+        }
+
         let lineToModify = lines[sectionKeysLineIndex];
-        let closingParenIndex = lineToModify.lastIndexOf(')');
-        let keyToInsert = ` "${newCommand.key}"`;
-        // Намиране на последния ключ (напр. "back") и вмъкване преди него
-        const lastKeyMatch = lineToModify.match(/"([^"]+)"\s*\)\s*$/);
-        if (lastKeyMatch) {
-             let insertIndex = lineToModify.lastIndexOf(lastKeyMatch[0]);
-             lines[sectionKeysLineIndex] = lineToModify.substring(0, insertIndex) + keyToInsert + " " + lineToModify.substring(insertIndex);
-             console.log(`Добавен ключ '${newCommand.key}' в *${sectionKeyName.toLowerCase()}-command-keys*`);
+        const backMarker = '"back"';
+        const backIndex = lineToModify.lastIndexOf(backMarker);
+
+        if (backIndex > -1) {
+            const beginning = lineToModify.substring(0, backIndex);
+            const end = lineToModify.substring(backIndex);
+            const keyToInsert = `"${newCommand.key}" `;
+            lines[sectionKeysLineIndex] = beginning + keyToInsert + end;
+            console.log(`Добавен ключ '${newCommand.key}' в *${sectionKeyName.toLowerCase()}-command-keys*`);
         } else {
-            updateStatus(`Грешка: Не може да се модифицира редът с ключове за ${sectionKeyName}`, 'error'); return originalContent;
+           updateStatus(`Грешка: Не може да се намери маркерът "back" за вмъкване на ключ в: ${sectionKeyName}`, 'error');
+           return originalContent;
         }
 
         // 3. Добавяне в `command_items` на съответната Lisp функция
@@ -249,8 +260,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if (commandItemsEndIndex > -1) {
-            const paddedKey = newCommand.key.padStart(newCommand.key.length + 3, ' ').padEnd(newCommand.key.length + 5, ' ');
-            const newLispEntry = `      ("${newCommand.key}" "${paddedKey}" "  - ${newCommand.label}")`;
+            // Генерираме форматиран ред, подобен на съществуващите
+            const keyForLabel = `   ${newCommand.key}  `;
+            const newLispEntry = `      (""${newCommand.key}"" ""${keyForLabel}"" ""  - ${newCommand.label}"")`;
             lines.splice(commandItemsEndIndex, 0, newLispEntry);
             console.log(`Добавен запис в 'command_items' за секция '${lispFuncName}'`);
         } else {
