@@ -95,13 +95,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const sectionMatch = line.match(sectionRegex);
             if (sectionMatch && sectionMatch[1]) {
                 const sectionNameRaw = sectionMatch[1].trim();
-                const sectionName = sectionNameRaw.charAt(0) + sectionNameRaw.slice(1).toLowerCase();
+                const sectionName = sectionNameRaw.charAt(0).toUpperCase() + sectionNameRaw.slice(1).toLowerCase();
                 if (!sections.includes(sectionName)) {
                     console.log(`Намерена нова секция: ${sectionName}`);
                     sections.push(sectionName);
                 }
                 
                 const keys = line.match(/"[^"]+"/g);
+                
                 if (keys) {
                     const cleanedKeys = keys.map(k => k.replace(/"/g, ''));
                     console.log(`Намерени ${cleanedKeys.length} ключа за секция ${sectionName}`);
@@ -222,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadBtn.addEventListener('click', async () => {
         console.clear();
         console.log("=====================================");
-        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ");
+        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАffffffffНЕ");
         console.log("=====================================");
         
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
@@ -271,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!fileData) return;
 
         const newContent = addNewCommandToContent(fileData.content, newCommand);
-        if (newContent === fileData.content) return; 
+        if (newContent === originalContent) return; 
 
         const commitMessage = `Добавена е нова команда: ${newCommand.key}`;
         const result = await updateFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT, newContent, fileData.sha, commitMessage);
