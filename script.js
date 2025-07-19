@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let GITHUB_PAT = '';
     
-    // --- API Взаимодействие ---
+    // --- API Взаимодействие (Коректно е) ---
     async function getFileContent(user, repo, path, token) {
         console.log("getFileContent: Изпращане на заявка до GitHub...");
         const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
@@ -57,8 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const sectionRegex = /;;; START (.*) KEYS/;
         const commandMapRegex = /\("([^"]+)"\s+\.\s+"([^"]+)"\)/;
-        const dclLabelRegex = /label = "  - ([^"]*)"/;
-        const dclKeyRegex = /key = "([^"]+)"/;
 
         let commandMap = {};
         let inCommandMap = false;
@@ -73,25 +71,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         console.log(`Намерени ${Object.keys(commandMap).length} команди в *command-map*`);
         
+        // !!!!! НОВ, ПО-НАДЕЖДЕН МЕТОД ЗА ИЗВЛИЧАНЕ НА ОПИСАНИЯ !!!!!
         let descriptions = {};
-        let inDclBlock = false;
-        let lastKeyFound = null;
-
         lines.forEach(line => {
-            if(line.includes(";;;;;;;; DCL_START ;;;;;;;;")) inDclBlock = true;
-            if(line.includes(";;;;;;;; DCL_END ;;;;;;;;;;")) inDclBlock = false;
+            // Търсим редове, които съдържат едновременно button и text_part
+            if (line.includes(': button {') && line.includes(': text_part {')) {
+                const keyMatch = line.match(/key = "([^"]+)"/);
+                const labelMatch = line.match(/label = "  - ([^"]*)"/);
 
-            if(inDclBlock) {
-                const keyMatch = line.match(dclKeyRegex);
-                if (keyMatch) {
-                    lastKeyFound = keyMatch[1];
-                }
-
-                const labelMatch = line.match(dclLabelRegex);
-                if (labelMatch && lastKeyFound) {
-                    descriptions[lastKeyFound] = labelMatch[1].replace(/\\"/g, '"');
-                    console.log(`Намерено описание за '${lastKeyFound}': ${descriptions[lastKeyFound]}`);
-                    lastKeyFound = null;
+                if (keyMatch && keyMatch[1] && labelMatch && labelMatch[1]) {
+                    const key = keyMatch[1].trim();
+                    const desc = labelMatch[1].replace(/\\"/g, '"').trim();
+                    descriptions[key] = desc;
                 }
             }
         });
@@ -130,11 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return { commands, sections, commandMap };
     }
 
-    const sectionToCyrillic = {
-        "Main": "Раздели", "Situacia": "Ситуация", "Naprechni": "Напречни",
-        "Nadlazhni": "Надлъжни", "Blokove": "Блокове", "Layouts": "Лейаути",
-        "Drugi": "Други", "Civil": "Civil", "Registri": "Регистри"
-    };
+
+    const sectionToCyrillic = { "Main": "Раздели", "Situacia": "Ситуация", "Naprechni": "Напречни", "Nadlazhni": "Надлъжни", "Blokove": "Блокове", "Layouts": "Лейаути", "Drugi": "Други", "Civil": "Civil", "Registri": "Регистри" };
 
     function displayCommands(commands, sections, commandMap) {
         const container = document.getElementById('commands-container');
@@ -194,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let sectionKeysIndex = lines.findIndex(line => line.includes(sectionKeysEndMarker));
         if (sectionKeysIndex === -1) { updateStatus(`Грешка: Не е намерен маркер за ключове: ${sectionKeysEndMarker}`, 'error'); return originalContent; }
         
-        let targetLineIndex = sectionKeysIndex; 
+        let targetLineIndex = sectionKeysIndex;
         let lineToModify = lines[targetLineIndex];
         let closingParenIndex = lineToModify.lastIndexOf(')');
         let keyToInsert = ` \"${newCommand.key}\"`;
@@ -235,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadBtn.addEventListener('click', async () => {
         console.clear();
         console.log("=====================================");
-        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ");
+        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ555555554");
         console.log("=====================================");
         
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
