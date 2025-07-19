@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "Registri": "Регистри"
     };
 
-    function displayCommands(commands, sections, commandMap) {
+        function displayCommands(commands, sections, commandMap) {
         const container = document.getElementById('commands-container');
         const sectionSelect = document.getElementById('command-section');
         container.innerHTML = '';
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         sectionsWithCommands.forEach(section => {
             const details = document.createElement('details');
-            details.open = true; // Open by default
+            // РЕДЪТ "details.open = true;" Е ПРЕМАХНАТ ОТТУК
             const summary = document.createElement('summary');
             summary.textContent = sectionToCyrillic[section] || section;
             details.appendChild(summary);
@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadBtn.addEventListener('click', async () => {
         console.clear();
         console.log("=====================================");
-        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ");
+        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ3");
         console.log("=====================================");
         
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
