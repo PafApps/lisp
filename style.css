@@ -19,7 +19,7 @@ h1, h2 {
     border-bottom: 2px solid #eee;
     padding-bottom: 10px;
 }
-input[type="text"], input[type="password"], textarea, select {
+input[type="password"], input[type="text"], textarea, select {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
@@ -27,10 +27,7 @@ input[type="text"], input[type="password"], textarea, select {
     border-radius: 4px;
     box-sizing: border-box;
 }
-textarea {
-    min-height: 80px;
-    resize: vertical;
-}
+textarea { min-height: 80px; resize: vertical; }
 button {
     display: inline-block;
     background-color: #007bff;
@@ -42,58 +39,50 @@ button {
     font-size: 16px;
     transition: background-color 0.3s ease;
 }
-button:hover {
-    background-color: #0056b3;
-}
-#config-section input {
-    margin-bottom: 10px;
-}
-.command-section {
-    margin-bottom: 25px;
+button:hover { background-color: #0056b3; }
+
+/* Сгъваеми секции */
+details {
     border: 1px solid #e1e4e8;
     border-radius: 6px;
-    padding: 15px;
+    margin-bottom: 10px;
+    padding: 5px;
 }
-.command-section h3 {
-    margin-top: 0;
+summary {
+    font-weight: bold;
     font-size: 1.2em;
+    padding: 10px;
+    cursor: pointer;
+    outline: none;
     color: #0366d6;
 }
 .command-entry {
+    display: flex;
+    align-items: center;
+    gap: 15px;
     padding: 10px;
-    border-bottom: 1px solid #eee;
+    border-top: 1px solid #eee;
 }
-.command-entry:last-child {
-    border-bottom: none;
+.copy-btn {
+    padding: 5px 10px;
+    font-size: 12px;
+    background-color: #6c757d;
 }
-.command-entry code {
+.copy-btn:hover { background-color: #5a6268; }
+code {
     background-color: #eef;
     padding: 2px 6px;
     border-radius: 4px;
     font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 }
-.command-entry p {
-    margin: 5px 0 0 0;
-}
-.hidden {
-    display: none;
-}
+p { margin: 5px 0 0 0; }
+.hidden { display: none; }
 #status-message {
     margin-top: 20px;
     padding: 10px;
     border-radius: 4px;
     text-align: center;
 }
-.status-success {
-    background-color: #d4edda;
-    color: #155724;
-}
-.status-error {
-    background-color: #f8d7da;
-    color: #721c24;
-}
-.loading {
-    text-align: center;
-    color: #666;
-    padding: 20px;
-}
+.status-success { background-color: #d4edda; color: #155724; }
+.status-error { background-color: #f8d7da; color: #721c24; }
+.loading { text-align: center; color: #666; padding: 20px; }
