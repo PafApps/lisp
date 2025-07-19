@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let FILE_PATH = '';
     let GITHUB_PAT = '';
     
-    // --- API Взаимодействие ---
+    // --- API Взаимодействие (Без промяна тук) ---
 
     async function getFileContent(user, repo, path, token) {
         const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const data = await response.json();
-            // Декодиране на Base64 съдържанието
             const content = atob(data.content);
             return { content, sha: data.sha };
         } catch (error) {
@@ -36,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     async function updateFileContent(user, repo, path, token, newContent, sha, commitMessage) {
         const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
-        // Кодиране на новото съдържание в Base64
         const encodedContent = btoa(newContent);
 
         try {
@@ -69,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // --- Парсване и Визуализация ---
+    // --- Парсване и Визуализация (Без промяна тук) ---
 
     function parseLispContent(content) {
         const commands = [];
@@ -92,13 +90,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const keyMatch = line.trim().match(keyRegex);
             if (keyMatch) {
-                // Търсим описанието на следващите няколко реда
                 let label = '';
                 const nextLines = lines.slice(lines.indexOf(line) + 1, lines.indexOf(line) + 5);
                 for(const nextLine of nextLines){
                     const labelMatch = nextLine.trim().match(labelRegex);
                     if(labelMatch){
-                        label = labelMatch[1].replace(/\\"/g, '"'); // Handle escaped quotes
+                        label = labelMatch[1].replace(/\\"/g, '"');
                         break;
                     }
                 }
@@ -148,19 +145,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function addNewCommandToContent(originalContent, newCommand) {
-        // Тази функция трябва да се адаптира към точната структура на вашия DCL
-        // Тук е даден прост пример, който добавя командата в края на съответната секция
         const sectionMarker = `;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  HELP ${newCommand.section}`;
         const lines = originalContent.split('\n');
         
-        // Намиране на реда, където започва секцията
         let sectionStartIndex = lines.findIndex(line => line.includes(sectionMarker));
         if (sectionStartIndex === -1) {
             updateStatus(`Не е намерена секция: ${newCommand.section}`, 'error');
             return originalContent;
         }
 
-        // Намиране на края на DCL дефиницията за тази секция
         let sectionEndIndex = lines.findIndex((line, index) => index > sectionStartIndex && line.trim() === '}');
         if(sectionEndIndex === -1){
             updateStatus(`Не може да се намери края на DCL за секция: ${newCommand.section}`, 'error');
@@ -195,7 +188,6 @@ document.addEventListener('DOMContentLoaded', () => {
 ""
 "}"
 `;
-        // Добавяме новия DCL код преди затварящата скоба на секцията
         lines.splice(sectionEndIndex - 2, 0, newCommandDCL);
         return lines.join('\n');
     }
@@ -212,25 +204,52 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- Събития ---
     
+    // !!!!! ТУК Е ПРОМЯНАТА !!!!!
     loadBtn.addEventListener('click', async () => {
-         console.log("Бутонът е натиснат!"); 
-        GITHUB_USER = document.getElementById('githubUser').value.trim();
-        GITHUB_REPO = document.getElementById('githubRepo').value.trim();
-        FILE_PATH = document.getElementById('filePath').value.trim();
-        GITHUB_PAT = document.getElementById('githubPat').value.trim();
+        console.log("Бутонът е натиснат!");
 
-        if (!GITHUB_USER || !GITHUB_REPO || !FILE_PATH || !GITHUB_PAT) {
-            updateStatus('Моля, попълнете всички полета за настройка.', 'error');
-            return;
-        }
-        
-        appContent.classList.remove('hidden');
-        document.getElementById('commands-container').innerHTML = '<p class="loading">Зареждане...</p>';
-        
-        const fileData = await getFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT);
-        if (fileData) {
-            const { commands, sections } = parseLispContent(fileData.content);
-            displayCommands(commands, sections);
+        try {
+            console.log("1. Прочитане на githubUser...");
+            GITHUB_USER = document.getElementById('githubUser').value.trim();
+            console.log(" -> Успешно: " + GITHUB_USER);
+
+            console.log("2. Прочитане на githubRepo...");
+            GITHUB_REPO = document.getElementById('githubRepo').value.trim();
+            console.log(" -> Успешно: " + GITHUB_REPO);
+            
+            console.log("3. Прочитане на filePath...");
+            FILE_PATH = document.getElementById('filePath').value.trim();
+            console.log(" -> Успешно: " + FILE_PATH);
+
+            console.log("4. Прочитане на githubPat...");
+            GITHUB_PAT = document.getElementById('githubPat').value.trim();
+            console.log(" -> Успешно (дължина на токена): " + GITHUB_PAT.length);
+
+            if (!GITHUB_USER || !GITHUB_REPO || !FILE_PATH || !GITHUB_PAT) {
+                updateStatus('Моля, попълнете всички полета за настройка.', 'error');
+                console.log("Проверката за празни полета не мина.");
+                return;
+            }
+            
+            console.log("5. Всички полета са прочетени. Показване на съдържанието...");
+            appContent.classList.remove('hidden');
+            document.getElementById('commands-container').innerHTML = '<p class="loading">Зареждане...</p>';
+            
+            console.log("6. Извикване на getFileContent...");
+            const fileData = await getFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT);
+            
+            console.log("7. getFileContent приключи. Проверка на данните...");
+            if (fileData) {
+                console.log(" -> Има данни. Извикване на parseLispContent...");
+                const { commands, sections } = parseLispContent(fileData.content);
+                console.log(" -> Парсването приключи. Извикване на displayCommands...");
+                displayCommands(commands, sections);
+            } else {
+                 console.log(" -> Няма данни. getFileContent е върнал null.");
+            }
+        } catch (e) {
+            console.error("ВЪЗНИКНА КРИТИЧНА ГРЕШКА:", e);
+            updateStatus("Възникна критична грешка, проверете конзолата (F12)!", 'error');
         }
     });
 
@@ -250,20 +269,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         updateStatus('Обработка... Моля, изчакайте.', 'success');
 
-        // 1. Взимаме текущата версия на файла
         const fileData = await getFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT);
         if (!fileData) return;
 
-        // 2. Добавяме новото съдържание
         const newContent = addNewCommandToContent(fileData.content, newCommand);
-        if (newContent === fileData.content) return; // Ако не е направена промяна
+        if (newContent === fileData.content) return; 
 
-        // 3. Записваме променения файл в GitHub
         const commitMessage = `Добавена е нова команда: ${newCommand.key}`;
         const result = await updateFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT, newContent, fileData.sha, commitMessage);
 
         if (result) {
-            // Презареждаме командите, за да се види новата
             addCommandForm.reset();
             const updatedFileData = await getFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT);
              if (updatedFileData) {
