@@ -49,13 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Парсване и Визуализация ---
-    function parseLispContent(content) {
-        console.log("parseLispContent: Започвам парсване...");
+   function parseLispContent(content) {
+        console.log("parseLispContent: Започвам парсване на съдържанието...");
         const commands = [];
         const sections = [];
         const lines = content.split('\n');
         
-        const sectionRegex = /;;; START (.*) KEYS/;
+        const sectionRegex = /;;; START (.*) KEYS/; 
         const commandMapRegex = /\("([^"]+)"\s+\.\s+"([^"]+)"\)/;
         const dclLabelRegex = /label = "([^"]*)"/; 
         const dclKeyRegex = /key = "([^"]+)"/;
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (match) commandMap[match[1]] = match[2];
             }
         });
-        console.log(`Намерени ${Object.keys(commandMap).length} команди в *command-map*`);
+        console.log("parseLispContent: Намерени команди в *command-map*:", Object.keys(commandMap).length);
         
         let descriptions = {};
         let currentDclKey = null;
@@ -89,25 +89,27 @@ document.addEventListener('DOMContentLoaded', () => {
                  }
             }
         });
-        console.log(`Извлечени ${Object.keys(descriptions).length} описания от DCL`);
+        console.log("parseLispContent: Извлечени описания от DCL:", Object.keys(descriptions).length);
 
         lines.forEach(line => {
             const sectionMatch = line.match(sectionRegex);
             if (sectionMatch && sectionMatch[1]) {
                 const sectionNameRaw = sectionMatch[1].trim();
-                const sectionName = sectionNameRaw.charAt(0).toUpperCase() + sectionNameRaw.slice(1).toLowerCase();
+                const sectionName = sectionNameRaw.charAt(0) + sectionNameRaw.slice(1).toLowerCase();
                 if (!sections.includes(sectionName)) {
-                    console.log(`Намерена нова секция: ${sectionName}`);
+                    console.log(`parseLispContent: Намерена нова секция: ${sectionName}`);
                     sections.push(sectionName);
                 }
-                
+
+                // !!!!! КОРЕКЦИЯ ТУК !!!!!
+                // Този Regex е прост и търси само кавички.
                 const keys = line.match(/"[^"]+"/g);
                 
                 if (keys) {
                     const cleanedKeys = keys.map(k => k.replace(/"/g, ''));
-                    console.log(`Намерени ${cleanedKeys.length} ключа за секция ${sectionName}`);
+                    console.log(`parseLispContent: Намерени ${cleanedKeys.length} ключа за секция ${sectionName}`);
                     cleanedKeys.forEach(key => {
-                        if (commandMap[key] && !commands.some(cmd => cmd.key === key && cmd.section === sectionName)) {
+                        if (commandMap[key] && !commands.some(cmd => cmd.key === key)) {
                            commands.push({
                                key: key,
                                label: descriptions[key] || `Изпълнява: ${commandMap[key]}`,
@@ -119,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        console.log(`Парсването приключи. Общо намерени команди: ${commands.length}, Общо секции: ${sections.length}`);
+        console.log(`parseLispContent: Парсването приключи. Общо намерени команди: ${commands.length}, Общо секции: ${sections.length}`);
         return { commands, sections };
     }
 
@@ -223,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadBtn.addEventListener('click', async () => {
         console.clear();
         console.log("=====================================");
-        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАffffffffНЕ");
+        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАfНЕ");
         console.log("=====================================");
         
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
