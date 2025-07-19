@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const sectionRegex = /;;; START (.*) KEYS/;
         const commandMapRegex = /\("([^"]+)"\s+\.\s+"([^"]+)"\)/;
-        const dclLabelRegex = /label = "([^"]*)"/; 
+        const dclLabelRegex = /label = "  - ([^"]*)"/;
         const dclKeyRegex = /key = "([^"]+)"/;
 
         let commandMap = {};
@@ -74,19 +74,25 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(`Намерени ${Object.keys(commandMap).length} команди в *command-map*`);
         
         let descriptions = {};
-        let currentDclKey = null;
+        let inDclBlock = false;
+        let lastKeyFound = null;
+
         lines.forEach(line => {
-             if (line.includes(': button {')) {
+            if(line.includes(";;;;;;;; DCL_START ;;;;;;;;")) inDclBlock = true;
+            if(line.includes(";;;;;;;; DCL_END ;;;;;;;;;;")) inDclBlock = false;
+
+            if(inDclBlock) {
                 const keyMatch = line.match(dclKeyRegex);
-                if (keyMatch) currentDclKey = keyMatch[1].trim();
-            }
-            if (line.includes(': text_part {')) {
-                 const labelMatch = line.match(dclLabelRegex);
-                 if(labelMatch && currentDclKey) {
-                    const desc = labelMatch[1].trim().replace(/^-\s*/, '').trim();
-                    if(desc) descriptions[currentDclKey] = desc;
-                    currentDclKey = null; 
-                 }
+                if (keyMatch) {
+                    lastKeyFound = keyMatch[1];
+                }
+
+                const labelMatch = line.match(dclLabelRegex);
+                if (labelMatch && lastKeyFound) {
+                    descriptions[lastKeyFound] = labelMatch[1].replace(/\\"/g, '"');
+                    console.log(`Намерено описание за '${lastKeyFound}': ${descriptions[lastKeyFound]}`);
+                    lastKeyFound = null;
+                }
             }
         });
         console.log(`Извлечени ${Object.keys(descriptions).length} описания от DCL`);
@@ -98,7 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const sectionNameRaw = sectionMatch[1].trim();
                 const sectionName = sectionNameRaw.charAt(0).toUpperCase() + sectionNameRaw.slice(1).toLowerCase();
                 if (!sections.includes(sectionName)) {
-                    console.log(`Намерена нова секция: ${sectionName}`);
                     sections.push(sectionName);
                 }
                 
@@ -107,7 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const keys = nextLine.match(/"[^"]+"/g);
                     if (keys) {
                         const cleanedKeys = keys.map(k => k.replace(/"/g, ''));
-                        console.log(`Намерени ${cleanedKeys.length} ключа за секция ${sectionName}`);
                         cleanedKeys.forEach(key => {
                             if (commandMap[key] && !commands.some(cmd => cmd.key === key && cmd.section === sectionName)) {
                                commands.push({
@@ -126,17 +130,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return { commands, sections, commandMap };
     }
 
-
     const sectionToCyrillic = {
-        "Main": "Раздели",
-        "Situacia": "Ситуация",
-        "Naprechni": "Напречни",
-        "Nadlazhni": "Надлъжни",
-        "Blokove": "Блокове",
-        "Layouts": "Лейаути",
-        "Drugi": "Други",
-        "Civil": "Civil",
-        "Registri": "Регистри"
+        "Main": "Раздели", "Situacia": "Ситуация", "Naprechni": "Напречни",
+        "Nadlazhni": "Надлъжни", "Blokove": "Блокове", "Layouts": "Лейаути",
+        "Drugi": "Други", "Civil": "Civil", "Registri": "Регистри"
     };
 
     function displayCommands(commands, sections, commandMap) {
@@ -238,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadBtn.addEventListener('click', async () => {
         console.clear();
         console.log("=====================================");
-        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ555");
+        console.log("НОВ ОПИТ ЗА ЗАРЕЖДАНЕ");
         console.log("=====================================");
         
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
