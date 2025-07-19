@@ -213,6 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Събития ---
     
     loadBtn.addEventListener('click', async () => {
+         console.log("Бутонът е натиснат!"); 
         GITHUB_USER = document.getElementById('githubUser').value.trim();
         GITHUB_REPO = document.getElementById('githubRepo').value.trim();
         FILE_PATH = document.getElementById('filePath').value.trim();
