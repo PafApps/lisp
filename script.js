@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
         try {
             const response = await fetch(url, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } });
-            console.log("getFileContent: Получен отговор със статус:", response.status);
+            console.log("getFileContent: Получен отговор съсDDFFFFFFF статус:", response.status);
             if (!response.ok) throw new Error(`Грешка при зареждане: ${response.statusText}`);
             const data = await response.json();
             const decodedContent = decodeURIComponent(escape(atob(data.content)));
