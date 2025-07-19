@@ -67,6 +67,7 @@ summary {
     padding: 5px 10px;
     font-size: 12px;
     background-color: #6c757d;
+    flex-shrink: 0;
 }
 .copy-btn:hover { background-color: #5a6268; }
 code {
@@ -74,8 +75,12 @@ code {
     padding: 2px 6px;
     border-radius: 4px;
     font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    color: #333;
 }
-p { margin: 5px 0 0 0; }
+.command-entry p {
+    margin: 0;
+    color: #555;
+}
 .hidden { display: none; }
 #status-message {
     margin-top: 20px;
