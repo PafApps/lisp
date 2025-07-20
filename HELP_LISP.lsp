@@ -341,6 +341,7 @@
       ("regAttAll" "regAttAll" "  - Изкарва всички атрибути заедно с координатите на блока")
       ("pcoord" "pcoord" "  - В аутокад изкарваш във файл координати на посочени от теб точки, като също ги именуваш една по една")
       ("rtl" "RTL" "  - върти TEXT и MTEXT спрямо линия или полилиния")
+      ("3333333333" "3333333333" "  - 33333333")
     )
   )
   ;;; END DCL DRUGI ITEMS
@@ -601,6 +602,7 @@
     ("333" . "333")
     ("33333" . "33333")
     ("333333333" . "333333333")
+    ("3333333333" . "3333333333")
 ;;; END COMMAND MAP
   )
 )
@@ -635,7 +637,7 @@
 ;;; END LAYOUTS KEYS
 
 ;;; START DRUGI KEYS
-(setq *drugi-command-keys* '("ETR" "BATCHETR" "BATCHPDF" "BATCHPDF2" "getv" "getversions" "meters" "BS" "SHOWLAYERS" "kmAll" "kmDel" "template" "LayerChange" "regAttAll" "pcoord" "rtl" "back"))
+(setq *drugi-command-keys* '("ETR" "BATCHETR" "BATCHPDF" "BATCHPDF2" "getv" "getversions" "meters" "BS" "SHOWLAYERS" "kmAll" "kmDel" "template" "LayerChange" "regAttAll" "pcoord" "rtl" "3333333333" "back"))
 ;;; END DRUGI KEYS
 
 ;;; START CIVIL KEYS
