@@ -267,6 +267,7 @@
       ("nmove" "nmove" "  - Премества обекти в блокове и XREF без да се налага да влизате в тях. (Внимавайте защото прави save На xref дори да е отворен!)")
       ("delblocks" "delblocks" "  - Изтрива избран блок или блокове от файла")
       ("wfb" "wfb" "  - Променя width factor на текст, който се намира в блок")
+      ("33333" "33333" "  - 33333")
     )
   )
   ;;; END DCL BLOKOVE ITEMS
@@ -597,6 +598,7 @@
     ("3" . "3")
     ("33" . "33")
     ("333" . "333")
+    ("33333" . "33333")
 ;;; END COMMAND MAP
   )
 )
@@ -623,7 +625,7 @@
 ;;; END NADLAZHNI KEYS
 
 ;;; START BLOKOVE KEYS
-(setq *blokove-command-keys* '("km" "qe" "qec" "addtoblock" "ndel" "ncut" "nmove" "delblocks" "wfb" "back"))
+(setq *blokove-command-keys* '("km" "qe" "qec" "addtoblock" "ndel" "ncut" "nmove" "delblocks" "wfb" "33333" "back"))
 ;;; END BLOKOVE KEYS
 
 ;;; START LAYOUTS KEYS
