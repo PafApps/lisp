@@ -374,6 +374,7 @@
       ("GRR" "GRR" "  - Прави BrakeLines и Boundery от сивилски точки за направата на повърхнина на същ. гл. релса - маркира се оста, на която искаме да направим Surface")
       ("GRR2" "GRR2" "  - Като GRR само, че тук се маркират самите точки и когато имаме големи криви трябва да се прави на части, защото при голямо закръгление дава грешки - да се коригира Bounderyto")
       ("cPExp" "cPExp" "  - Изкарва регистър на реперите от сивилски точки. Маркира се алаймънт и всички сивилски точки")
+      ("33333333333" "33333333333" "  - 3333333")
     )
   )
   ;;; END DCL CIVIL ITEMS
@@ -603,6 +604,7 @@
     ("33333" . "33333")
     ("333333333" . "333333333")
     ("3333333333" . "3333333333")
+    ("33333333333" . "33333333333")
 ;;; END COMMAND MAP
   )
 )
@@ -641,7 +643,7 @@
 ;;; END DRUGI KEYS
 
 ;;; START CIVIL KEYS
-(setq *civil-command-keys* '("slg" "s2p" "s2f" "flkm" "bExp" "bExp2" "pExp" "regV" "regH" "regC" "regS" "kmATT" "GRR" "GRR2" "cPExp" "back"))
+(setq *civil-command-keys* '("slg" "s2p" "s2f" "flkm" "bExp" "bExp2" "pExp" "regV" "regH" "regC" "regS" "kmATT" "GRR" "GRR2" "cPExp" "33333333333" "back"))
 ;;; END CIVIL KEYS
 
 ;;; START REGISTRI KEYS
