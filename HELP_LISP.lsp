@@ -591,7 +591,6 @@
     ("СИВИЛ"       . "СИВИЛ")
     ("РЕГИСТРИ"    . "РЕГИСТРИ")
     ("d3t" . "d3t")
-    ("3333333333" . "3333333333")
     ("33333333333" . "33333333333")
     ("333333333333" . "333333333333")
 ;;; END COMMAND MAP
@@ -628,7 +627,7 @@
 ;;; END LAYOUTS KEYS
 
 ;;; START DRUGI KEYS
-(setq *drugi-command-keys* '("ETR" "BATCHETR" "BATCHPDF" "BATCHPDF2" "getv" "getversions" "meters" "BS" "SHOWLAYERS" "kmAll" "kmDel" "template" "LayerChange" "regAttAll" "pcoord" "rtl" "3333333333" "back"))
+(setq *drugi-command-keys* '("ETR" "BATCHETR" "BATCHPDF" "BATCHPDF2" "getv" "getversions" "meters" "BS" "SHOWLAYERS" "kmAll" "kmDel" "template" "LayerChange" "regAttAll" "pcoord" "rtl" "back"))
 ;;; END DRUGI KEYS
 
 ;;; START CIVIL KEYS
