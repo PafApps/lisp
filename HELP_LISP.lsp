@@ -395,7 +395,6 @@
       ("regVro" "regVro" "  - Изкарва регистър в ПРОФИЛ на ПЪТ във файл в същата папка.")
       ("regCro" "regCro" "  - Изкарва КООРДИНАТЕН регистър на ПЪТ във файл в същата папка.")
       ("cPExp" "cPExp" "  - Изкарва регистър на реперите от сивилски точки. Маркира се алаймънт и всички сивилски точки")
-      ("7777777777777777" "   7777777777777777  " "  - ddd  dddddddddddddddd ddddddddddddddddd dddddddddddddddd")
     )
   )
   ;;; END DCL REGISTRI ITEMS
@@ -591,7 +590,6 @@
     ("СИВИЛ"       . "СИВИЛ")
     ("РЕГИСТРИ"    . "РЕГИСТРИ")
     ("d3t" . "d3t")
-    ("7777777777777777" . "7777777777777777")
 ;;; END COMMAND MAP
   )
 )
@@ -634,7 +632,7 @@
 ;;; END CIVIL KEYS
 
 ;;; START REGISTRI KEYS
-(setq *registri-command-keys* '("bExp" "pExp" "regV" "regH" "regC" "regS" "regS2" "regHro" "regVro" "regCro" "cPExp" "7777777777777777" "back"))
+(setq *registri-command-keys* '("bExp" "pExp" "regV" "regH" "regC" "regS" "regS2" "regHro" "regVro" "regCro" "cPExp" "back"))
 ;;; END REGISTRI KEYS
 
 
