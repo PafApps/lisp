@@ -157,7 +157,7 @@
       ("Bind-Detach" "Bind-Detach" "  -  	- вкарва заредените xref-ове във файла като блокове, а незаредените ги детачва")
       ("MTB" "MTB" "  -  	- същото като MTA, но за блокове.")
       ( "7777777777777777" "  - dddddd")
-      ("3" "3" "  - ddd")
+      ( "3" "  - ddd")
     )
   )
   ;;; END DCL SITUACIA ITEMS
@@ -599,7 +599,6 @@
     ("СИВИЛ"       . "СИВИЛ")
     ("РЕГИСТРИ"    . "РЕГИСТРИ")
     ("d3t" . "d3t")
-    ("3" . "3")
     ("33" . "33")
     ("333" . "333")
     ("33333" . "33333")
@@ -621,7 +620,7 @@
 ;;; END MAIN KEYS
 
 ;;; START SITUACIA KEYS
-(setq *situacia-command-keys* '("km" "slope" "vpo" "dims" "qe" "qec" "addtoblock" "ndel" "ncut" "nmove" "label" "delblocks" "ww" "calc" "wf" "wfb" "DIt" "etr" "etr1" "PJ" "STRELKA" "loadlineM" "tkm" "MTA" "Bind-Detach" "MTB" "3" "back"))
+(setq *situacia-command-keys* '("km" "slope" "vpo" "dims" "qe" "qec" "addtoblock" "ndel" "ncut" "nmove" "label" "delblocks" "ww" "calc" "wf" "wfb" "DIt" "etr" "etr1" "PJ" "STRELKA" "loadlineM" "tkm" "MTA" "Bind-Detach" "MTB" "back"))
 ;;; END SITUACIA KEYS
 
 ;;; START NAPRECHNI KEYS
