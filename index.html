@@ -19,7 +19,6 @@
         <hr>
 
         <div id="app-content" class="hidden">
-            <!-- Секцията за показване на командите е заменена с брояч -->
             <div id="command-summary">
                 <h2>Обобщение на командите</h2>
                 <p>Общо извлечени команди: <span id="command-count">0</span></p>
@@ -34,6 +33,8 @@
                     <input type="text" id="command-key" placeholder="Ключ на командата (напр. dd)" required>
                     <textarea id="command-label" placeholder="Описание на командата" required></textarea>
                     <button type="submit">Добави и Запази в GitHub</button>
+                    <!-- Ново: Контейнер за съобщения за тази форма -->
+                    <div id="add-status-message" class="form-status-message"></div>
                 </form>
             </div>
 
@@ -44,10 +45,13 @@
                     <p>Въведете точния ключ на командата, която искате да премахнете. Операцията е необратима.</p>
                     <input type="text" id="delete-command-key" placeholder="Ключ на командата за изтриване (напр. dd)" required>
                     <button type="submit" class="delete-btn">Изтрий Командата от GitHub</button>
+                    <!-- Ново: Контейнер за съобщения за тази форма -->
+                    <div id="delete-status-message" class="form-status-message"></div>
                 </form>
             </div>
         </div>
         
+        <!-- Този контейнер остава за глобални съобщения (напр. грешка с PAT) -->
         <div id="status-message" style="display: none;"></div>
     </div>
 
