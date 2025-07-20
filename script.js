@@ -113,10 +113,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const sectionToCyrillic = { "Main": "Раздели", "Situacia": "Ситуация", "Naprechni": "Напречни", "Nadlazhni": "Надлъжни", "Blokove": "Блокове", "Layouts": "Лейаути", "Drugi": "Други", "Civil": "Civil", "Registri": "Регистри" };
 
-    function displayCommands(commands, sections, commandMap) {
-        const container = document.getElementById('commands-container');
+    function displayCommands(commands, sections) {
+        const commandCountSpan = document.getElementById('command-count');
         const sectionSelect = document.getElementById('command-section');
-        container.innerHTML = '';
+
+        // Актуализирай брояча на командите
+        commandCountSpan.textContent = commands.length;
+        
+        // Попълни падащото меню със секциите
         sectionSelect.innerHTML = '<option value="" disabled selected>Избери секция...</option>';
         const sectionsForDropdown = sections.filter(s => s.toLowerCase() !== 'main');
         sectionsForDropdown.forEach(section => {
@@ -124,30 +128,6 @@ document.addEventListener('DOMContentLoaded', () => {
             sectionOption.value = section.toUpperCase();
             sectionOption.textContent = sectionToCyrillic[section] || section;
             sectionSelect.appendChild(sectionOption);
-        });
-        const sectionsWithCommands = sections.filter(section => commands.some(cmd => cmd.section === section));
-        sectionsWithCommands.forEach(section => {
-            const details = document.createElement('details');
-            const summary = document.createElement('summary');
-            summary.textContent = sectionToCyrillic[section] || section;
-            details.appendChild(summary);
-            const commandsInSection = commands.filter(cmd => cmd.section === section);
-            commandsInSection.forEach(cmd => {
-                const entryDiv = document.createElement('div');
-                entryDiv.className = 'command-entry';
-                const copyBtn = document.createElement('button');
-                copyBtn.textContent = 'Копирай';
-                copyBtn.className = 'copy-btn';
-                copyBtn.title = `Копирай "${commandMap[cmd.key] || cmd.key}"`;
-                copyBtn.addEventListener('click', () => {
-                    navigator.clipboard.writeText(commandMap[cmd.key] || cmd.key);
-                    updateStatus(`Командата "${commandMap[cmd.key] || cmd.key}" е копирана!`, 'success');
-                });
-                entryDiv.innerHTML = `<code>${cmd.key}</code><p>${cmd.label}</p>`;
-                entryDiv.prepend(copyBtn);
-                details.appendChild(entryDiv);
-            });
-            container.appendChild(details);
         });
     }
 
@@ -240,11 +220,13 @@ document.addEventListener('DOMContentLoaded', () => {
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
         if (!GITHUB_PAT) { updateStatus('Моля, въведете Personal Access Token (PAT).', 'error'); return; }
         appContent.classList.remove('hidden');
-        document.getElementById('commands-container').innerHTML = '<p class="loading">Зареждане...</p>';
+        document.getElementById('command-summary').innerHTML = '<p class="loading">Зареждане...</p>';
         const fileData = await getFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT);
         if (fileData) {
-            const { commands, sections, commandMap } = parseLispContent(fileData.content);
-            displayCommands(commands, sections, commandMap);
+            // Възстановяване на HTML структурата след зареждане, ако е била премахната
+            document.getElementById('command-summary').innerHTML = `<h2>Обобщение на командите</h2><p>Общо извлечени команди: <span id="command-count">0</span></p>`;
+            const { commands, sections } = parseLispContent(fileData.content);
+            displayCommands(commands, sections);
         }
     });
 
@@ -267,8 +249,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const commitMessage = `Добавена е нова команда: ${newCommand.key}`;
         const result = await updateFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT, newContent, fileData.sha, commitMessage);
         if (result) {
+            updateStatus(`Командата '${newCommand.key}' е успешно добавена!`, 'success');
             addCommandForm.reset();
-            loadBtn.click();
+            loadBtn.click(); // Презарежда данните и актуализира брояча
         }
     });
 
@@ -292,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (result) {
             updateStatus(`Командата '${keyToDelete}' е успешно изтрита!`, 'success');
             document.getElementById('delete-command-key').value = '';
-            loadBtn.click();
+            loadBtn.click(); // Презарежда данните и актуализира брояча
         }
     });
 });
