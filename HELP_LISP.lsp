@@ -187,7 +187,6 @@
       ("wf" "wf" "  - Променя width factor на избран/и текстови обекти")
       ("wfb" "wfb" "  - Променя width factor на текст, който се намира в блок")
       ("DIt" "DIt" "  - Измерва разстоянието между две точки и го записва в избран TEXT или MTEXT")
-      ("333" "333" "  - 33fff")
     )
   )
   ;;; END DCL NADLZHNI ITEMS
@@ -592,7 +591,6 @@
     ("СИВИЛ"       . "СИВИЛ")
     ("РЕГИСТРИ"    . "РЕГИСТРИ")
     ("d3t" . "d3t")
-    ("333" . "333")
     ("33333" . "33333")
     ("333333333" . "333333333")
     ("3333333333" . "3333333333")
@@ -620,7 +618,7 @@
 ;;; END NAPRECHNI KEYS
 
 ;;; START NADLAZHNI KEYS
-(setq *nadlazhni-command-keys* '("km" "vpo" "qe" "qec" "Ln" "addtoblock" "ndel" "ncut" "nmove" "delblocks" "calc" "wf" "wfb" "DIt" "333" "back"))
+(setq *nadlazhni-command-keys* '("km" "vpo" "qe" "qec" "Ln" "addtoblock" "ndel" "ncut" "nmove" "delblocks" "calc" "wf" "wfb" "DIt" "back"))
 ;;; END NADLAZHNI KEYS
 
 ;;; START BLOKOVE KEYS
