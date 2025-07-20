@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мениджър на AutoLISP Команди55</title>
+    <title>Мениджър на AutoLISP Команди</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -19,9 +19,10 @@
         <hr>
 
         <div id="app-content" class="hidden">
-            <h2>Списък с команди</h2>
-            <div id="commands-container">
-                <p class="loading">Зареждане на командите...</p>
+            <!-- Секцията за показване на командите е заменена с брояч -->
+            <div id="command-summary">
+                <h2>Обобщение на командите</h2>
+                <p>Общо извлечени команди: <span id="command-count">0</span></p>
             </div>
 
             <div class="form-container">
