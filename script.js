@@ -130,29 +130,34 @@ document.addEventListener('DOMContentLoaded', () => {
         let lines = originalContent.split('\n');
         const originalLength = originalContent.length;
 
-        // 1. Премахване от *command-map*
+        // Regex за редовете, които трябва да се ПРЕМАХНАТ ИЗЦЯЛО
         const commandMapRegex = new RegExp(`^\\s*\\("${commandKey}"\\s+\\.\\s+"[^"]+"\\)`);
-        lines = lines.filter(line => !commandMapRegex.test(line));
+        const commandItemRegex = new RegExp(`^\\s*\\("${commandKey}"\\s+`); // Намира реда в DCL блока
 
-        // 2. Премахване от списъка с ключове на секцията (*-command-keys*)
+        // Стъпка 1: Филтрираме и премахваме изцяло редовете от command-map и DCL блока
+        let linesAfterRemoval = lines.filter(line => {
+            const isCommandMapEntry = commandMapRegex.test(line);
+            const isCommandItemEntry = commandItemRegex.test(line);
+            // Запазваме реда само ако НЕ Е нито едно от двете
+            return !isCommandMapEntry && !isCommandItemEntry;
+        });
+
+        // Regex за ключа, който трябва да се ПРЕМАХНЕ от СПИСЪКА С КЛЮЧОВЕ
         const keyListRegex = new RegExp(`\\s*"${commandKey}"`);
-        lines = lines.map(line => {
-            // КОРЕКЦИЯ: Извършваме замяната само на редовете, които дефинират списък с ключове
+
+        // Стъпка 2: От вече филтрираните редове, МОДИФИЦИРАМЕ само реда със списъка с ключове
+        let linesAfterModification = linesAfterRemoval.map(line => {
             if (line.trim().startsWith('(setq *') && line.includes('-command-keys*')) {
                 return line.replace(keyListRegex, '');
             }
             return line;
         });
 
-        // 3. Премахване от `command_items` в съответната DCL функция
-        const commandItemRegex = new RegExp(`^\\s*\\("${commandKey}"\\s+`);
-        lines = lines.filter(line => !commandItemRegex.test(line));
-
-        const newContent = lines.join('\n');
+        const newContent = linesAfterModification.join('\n');
 
         // Проверка дали нещо е изтрито
         if (newContent.length >= originalLength) {
-            return null;
+            return null; // Връщаме null, ако ключът не е намерен никъде
         }
 
         return newContent;
@@ -240,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const newContent = removeCommandFromContent(fileData.content, keyToDelete);
         if (newContent === null) {
-            updateStatus(`Ключ '${keyToDelete}' не беше намерен във файла за изтриване.`, 'error', statusId);
+            updateStatus(`Ключ '${keyToDelete}' не беше намерен във файла за изтриване.`, 'error', 'delete-status-message');
             return;
         }
 
