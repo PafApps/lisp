@@ -591,7 +591,6 @@
     ("СИВИЛ"       . "СИВИЛ")
     ("РЕГИСТРИ"    . "РЕГИСТРИ")
     ("d3t" . "d3t")
-    ("333333333" . "333333333")
     ("3333333333" . "3333333333")
     ("33333333333" . "33333333333")
     ("333333333333" . "333333333333")
@@ -625,7 +624,7 @@
 ;;; END BLOKOVE KEYS
 
 ;;; START LAYOUTS KEYS
-(setq *layouts-command-keys* '("prop" "DATA" "podpisi" "fields" "psu" "relay" "Lsteal" "vpo" "ttbhelp" "ttb" "ttbu" "TabSort" "copyVp" "c2l" "c2al" "selectRWC" "333333333" "back"))
+(setq *layouts-command-keys* '("prop" "DATA" "podpisi" "fields" "psu" "relay" "Lsteal" "vpo" "ttbhelp" "ttb" "ttbu" "TabSort" "copyVp" "c2l" "c2al" "selectRWC" "back"))
 ;;; END LAYOUTS KEYS
 
 ;;; START DRUGI KEYS
