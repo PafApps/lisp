@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let GITHUB_PAT = '';
     let lispData = { sections: [], commandMap: {}, uniqueCommandKeys: [] };
     
-    // --- API Взаимодействие ---
+    // --- API Взаимодействие (без промяна) ---
     async function getFileContent(user, repo, path, token) {
         try {
             const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
@@ -45,62 +45,41 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /**
-     * ПРОМЕНЕНА ФУНКЦИЯ: Парсва и веднага филтрира командите
-     */
+    // --- Парсване (без промяна) ---
     function parseLispContent(content) {
         const sections = [];
         const lines = content.split('\n');
-        
-        // 1. Намиране на всички секции
         const sectionRegex = /;;; START (.*?) KEYS/;
         for (let i = 0; i < lines.length; i++) {
             const sectionMatch = lines[i].match(sectionRegex);
             if (sectionMatch && sectionMatch[1]) {
                 const sectionNameRaw = sectionMatch[1].trim();
                 const sectionName = sectionNameRaw.charAt(0).toUpperCase() + sectionNameRaw.slice(1).toLowerCase();
-                if (!sections.includes(sectionName)) {
-                    sections.push(sectionName);
-                }
+                if (!sections.includes(sectionName)) sections.push(sectionName);
             }
         }
-
-        // 2. Намиране и филтриране на command-map
         const commandMapRegex = /\(\s*"([^"]+)"\s*\.\s*"[^"]*"\s*\)/g;
         const commandMapSectionMatch = content.match(/;;; START COMMAND MAP([\s\S]*?);;; END COMMAND MAP/);
-        
         const commandMap = {};
         const uniqueCommandKeys = new Set();
-
         if (commandMapSectionMatch) {
             const mapContent = commandMapSectionMatch[1];
             let match;
             while ((match = commandMapRegex.exec(mapContent)) !== null) {
                 const key = match[1];
-                commandMap[key] = key; // Попълваме пълния commandMap за проверките
-                
-                // *** КЛЮЧОВА ЛОГИКА ЗА ФИЛТРИРАНЕ (като в примера) ***
-                // Изключваме 'back', 'pps_back', 'help' и всичко, започващо с буква на кирилица (имената на категориите)
+                commandMap[key] = key;
                 const isCyrillic = /^[А-Яа-я]/.test(key);
                 const isExcludedWord = ['back', 'pps_back', 'help'].includes(key.toLowerCase());
-                
-                if (!isCyrillic && !isExcludedWord) {
-                    uniqueCommandKeys.add(key);
-                }
+                if (!isCyrillic && !isExcludedWord) uniqueCommandKeys.add(key);
             }
         }
-        
         return { sections, commandMap, uniqueCommandKeys: Array.from(uniqueCommandKeys) };
     }
     
-    // --- Визуализация ---
+    // --- Визуализация (без промяна) ---
     const sectionToCyrillic = { "Main": "Раздели", "Situacia": "Ситуация", "Naprechni": "Напречни", "Nadlazhni": "Надлъжни", "Blokove": "Блокове", "Layouts": "Лейаути", "Drugi": "Други", "Civil": "Civil", "Registri": "Регистри" };
-    
     function displayData({ sections, uniqueCommandKeys }) {
-        // Показваме броя на филтрираните команди
         document.getElementById('command-count').textContent = uniqueCommandKeys.length;
-
-        // Попълваме падащото меню със секции
         const sectionSelect = document.getElementById('command-section');
         sectionSelect.innerHTML = '<option value="" disabled selected>Избери секция...</option>';
         sections.filter(s => s.toLowerCase() !== 'main').forEach(section => {
@@ -111,18 +90,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Модификация на съдържание (без промяна в логиката) ---
+    // --- Модификация на съдържание ---
     const sectionToKeyMap = { "MAIN": "MAIN", "SITUACIA": "SITUACIA", "NAPRECHNI": "NAPRECHNI", "NADLAZHNI": "NADLAZHNI", "BLOKOVE": "BLOKOVE", "LAYOUTS": "LAYOUTS", "DRUGI": "DRUGI", "CIVIL": "CIVIL", "REGISTRI": "REGISTRI" };
     const keyToLispFuncMap = { "SITUACIA": "СИТУАЦИЯ", "NAPRECHNI": "НАПРЕЧНИ", "NADLAZHNI": "НАДЛЪЖНИ", "BLOKOVE": "БЛОКОВЕ", "LAYOUTS": "ЛЕЙАУТИ", "DRUGI": "ДРУГИ", "CIVIL": "СИВИЛ", "REGISTRI": "РЕГИСТРИ" };
+
+    /**
+     * *** КОРЕГИРАНА ФУНКЦИЯ ***
+     */
     function addNewCommandToContent(originalContent, newCommand) {
         let lines = originalContent.split('\n');
-        let commandMapEndIndex = -1, inMap = false;
-        for(let i=0; i<lines.length; i++){
-            if(lines[i].includes('(setq *command-map*')) inMap = true;
-            if(inMap && lines[i].trim() === ')') { commandMapEndIndex = i; break; }
+
+        // *** КОРЕКЦИЯ 1: Намираме маркера за край и вмъкваме ПРЕДИ него ***
+        const commandMapEndMarker = ';;; END COMMAND MAP';
+        let commandMapEndIndex = lines.findIndex(line => line.includes(commandMapEndMarker));
+        if (commandMapEndIndex === -1) {
+             updateStatus('Грешка: Не е намерен маркер ;;; END COMMAND MAP.', 'error', 'add-status-message');
+             return null;
         }
-        if (commandMapEndIndex === -1) return null;
-        lines.splice(commandMapEndIndex, 0, `    ("${newCommand.key}" . "${newCommand.key}")`);
+        const newCommandMapEntry = `    ("${newCommand.key}" . "${newCommand.key}")`;
+        lines.splice(commandMapEndIndex, 0, newCommandMapEntry); // Вмъкваме на реда ПРЕДИ маркера
+
         const sectionKeyName = sectionToKeyMap[newCommand.section.toUpperCase()];
         const sectionKeysStartMarker = `(setq *${sectionKeyName.toLowerCase()}-command-keys*`;
         let sectionKeysLineIndex = lines.findIndex(line => line.trim().startsWith(sectionKeysStartMarker));
@@ -131,19 +118,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const backIndex = lineToModify.lastIndexOf('"back"');
         if (backIndex > -1) lines[sectionKeysLineIndex] = lineToModify.substring(0, backIndex) + `"${newCommand.key}" ` + lineToModify.substring(backIndex);
         else return null;
+        
         const lispFuncName = keyToLispFuncMap[newCommand.section.toUpperCase()];
         const functionStartMarker = `defun create_dclhelplisp${lispFuncName}`;
         let functionStartIndex = lines.findIndex(line => line.includes(functionStartMarker));
         if (functionStartIndex === -1) return null;
+        
         let commandItemsEndIndex = -1, inItems = false;
         for (let i = functionStartIndex; i < lines.length; i++) {
             if (lines[i].includes('(setq command_items')) { inItems = true; continue; }
             if (inItems && lines[i].trim() === ')') { commandItemsEndIndex = i; break; }
         }
-        if (commandItemsEndIndex > -1) lines.splice(commandItemsEndIndex, 0, `      ("${newCommand.key}" "   ${newCommand.key}  " "  - ${newCommand.label}")`);
-        else return null;
+        if (commandItemsEndIndex > -1) {
+             // *** КОРЕКЦИЯ 2: Премахваме излишните интервали около втория елемент ***
+            const newLispEntry = `      ("${newCommand.key}" "${newCommand.key}" "  - ${newCommand.label}")`;
+            lines.splice(commandItemsEndIndex, 0, newLispEntry);
+        } else {
+             return null;
+        }
+        
         return lines.join('\n');
     }
+
     function removeCommandFromContent(originalContent, commandKey) {
         let lines = originalContent.split('\n');
         lines = lines.filter(line => !new RegExp(`^\\s*\\("${commandKey}"\\s+\\.\\s+"[^"]+"\\)`).test(line));
@@ -163,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { statusDiv.style.display = 'none'; }, 5000);
     }
     
-    // --- Събития ---
+    // --- Събития (без промяна) ---
     loadBtn.addEventListener('click', async () => {
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
         if (!GITHUB_PAT) { updateStatus('Моля, въведете Personal Access Token (PAT).', 'error'); return; }
@@ -173,8 +169,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const fileData = await getFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT);
         if (fileData) {
             summary.innerHTML = `<h2>Обобщение на командите</h2><p>Общо уникални команди: <span id="command-count">0</span></p>`;
-            lispData = parseLispContent(fileData.content); // Парсваме и филтрираме
-            displayData(lispData); // Показваме новите данни
+            lispData = parseLispContent(fileData.content);
+            displayData(lispData);
         }
     });
 
