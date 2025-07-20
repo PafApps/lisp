@@ -302,6 +302,7 @@
       ("c2l" "c2l" "  - копира избран от вас обект/обекти в избрани от вас лейаути във файла ")
       ("c2al" "c2al" "  - копира избран от вас обект/обекти във всички лейаути във файла ")
       ("selectRWC" "selectRWC" "  - маркира последователно по Y рамките на напречните профили, за да може да се направят Layout-и с MAPWSPACE ")
+      ("333333333" "333333333" "  - 33333333")
     )
   )
   ;;; END DCL LAYOUTI ITEMS
@@ -599,6 +600,7 @@
     ("33" . "33")
     ("333" . "333")
     ("33333" . "33333")
+    ("333333333" . "333333333")
 ;;; END COMMAND MAP
   )
 )
@@ -629,7 +631,7 @@
 ;;; END BLOKOVE KEYS
 
 ;;; START LAYOUTS KEYS
-(setq *layouts-command-keys* '("prop" "DATA" "podpisi" "fields" "psu" "relay" "Lsteal" "vpo" "ttbhelp" "ttb" "ttbu" "TabSort" "copyVp" "c2l" "c2al" "selectRWC" "back"))
+(setq *layouts-command-keys* '("prop" "DATA" "podpisi" "fields" "psu" "relay" "Lsteal" "vpo" "ttbhelp" "ttb" "ttbu" "TabSort" "copyVp" "c2l" "c2al" "selectRWC" "333333333" "back"))
 ;;; END LAYOUTS KEYS
 
 ;;; START DRUGI KEYS
