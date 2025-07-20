@@ -11,6 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // =======================================
 
     let GITHUB_PAT = '';
+    // Глобален обект за съхранение на парсираните данни
+    let lispData = {
+        commands: [],
+        sections: [],
+        commandMap: {}
+    };
     
     // --- API Взаимодействие ---
     async function getFileContent(user, repo, path, token) {
@@ -50,16 +56,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const sections = [];
         const lines = content.split('\n');
         const sectionRegex = /;;; START (.*?) KEYS/;
+        // Променяме регулярния израз да търси дефиницията на *command-map*
         const commandMapRegex = /\("([^"]+)"\s+\.\s+"([^"]+)"\)/;
         
         let commandMap = {};
-        let inCommandMap = false;
+        // Търсим в целия файл за *command-map*
+        let inCommandMapBlock = false;
         lines.forEach(line => {
-            if (line.includes(';;; START COMMAND MAP')) inCommandMap = true;
-            if (line.includes(';;; END COMMAND MAP')) inCommandMap = false;
-            if (inCommandMap) {
+            if (line.includes('(setq *command-map*')) {
+                inCommandMapBlock = true;
+            }
+            if (inCommandMapBlock) {
                 const match = line.match(commandMapRegex);
-                if (match) commandMap[match[1]] = match[2];
+                if (match) {
+                    commandMap[match[1]] = match[2];
+                }
+                // Проверяваме за затваряща скоба на нов ред
+                if (line.trim() === ')') {
+                    inCommandMapBlock = false;
+                }
             }
         });
         
@@ -113,12 +128,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const sectionToCyrillic = { "Main": "Раздели", "Situacia": "Ситуация", "Naprechni": "Напречни", "Nadlazhni": "Надлъжни", "Blokove": "Блокове", "Layouts": "Лейаути", "Drugi": "Други", "Civil": "Civil", "Registri": "Регистри" };
 
-    function displayCommands(commands, sections) {
+    function displayData(data) {
+        const { sections, commandMap } = data;
         const commandCountSpan = document.getElementById('command-count');
         const sectionSelect = document.getElementById('command-section');
 
-        // Актуализирай брояча на командите
-        commandCountSpan.textContent = commands.length;
+        // Актуализирай брояча на командите спрямо броя ключове в commandMap
+        commandCountSpan.textContent = Object.keys(commandMap).length;
         
         // Попълни падащото меню със секциите
         sectionSelect.innerHTML = '<option value="" disabled selected>Избери секция...</option>';
@@ -136,9 +152,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function addNewCommandToContent(originalContent, newCommand) {
         let lines = originalContent.split('\n');
-        const commandMapEndMarker = ';;; END COMMAND MAP';
-        let commandMapEndIndex = lines.findIndex(line => line.includes(commandMapEndMarker));
-        if (commandMapEndIndex === -1) { updateStatus("Грешка: Не е намерен маркер ;;; END COMMAND MAP.", 'error'); return originalContent; }
+        // Намиране на края на *command-map* за добавяне на нова команда
+        let commandMapEndIndex = -1;
+        let inMap = false;
+        for(let i=0; i<lines.length; i++){
+            if(lines[i].includes('(setq *command-map*')) inMap = true;
+            if(inMap && lines[i].trim() === ')') {
+                commandMapEndIndex = i;
+                break;
+            }
+        }
+        if (commandMapEndIndex === -1) { updateStatus("Грешка: Не е намерен край на *command-map*.", 'error'); return originalContent; }
         const newCommandMapEntry = `    ("${newCommand.key}" . "${newCommand.key}")`;
         lines.splice(commandMapEndIndex, 0, newCommandMapEntry);
 
@@ -151,10 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const backMarker = '"back"';
         const backIndex = lineToModify.lastIndexOf(backMarker);
         if (backIndex > -1) {
-            const beginning = lineToModify.substring(0, backIndex);
-            const end = lineToModify.substring(backIndex);
-            const keyToInsert = `"${newCommand.key}" `;
-            lines[sectionKeysLineIndex] = beginning + keyToInsert + end;
+            lines[sectionKeysLineIndex] = lineToModify.substring(0, backIndex) + `"${newCommand.key}" ` + lineToModify.substring(backIndex);
         } else {
            updateStatus(`Грешка: Не може да се намери маркерът "back" за вмъкване на ключ в: ${sectionKeyName}`, 'error');
            return originalContent;
@@ -172,8 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (inItems && lines[i].trim() === ')') { commandItemsEndIndex = i; break; }
         }
         if (commandItemsEndIndex > -1) {
-            const keyForLabel = `   ${newCommand.key}  `;
-            const newLispEntry = `      ("${newCommand.key}" "${keyForLabel}" "  - ${newCommand.label}")`;
+            const newLispEntry = `      ("${newCommand.key}" "   ${newCommand.key}  " "  - ${newCommand.label}")`;
             lines.splice(commandItemsEndIndex, 0, newLispEntry);
         } else {
             updateStatus(`Грешка: Не може да се намери краят на 'command_items' за секция '${lispFuncName}'`, 'error');
@@ -184,26 +204,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function removeCommandFromContent(originalContent, commandKey) {
         let lines = originalContent.split('\n');
-        let initialLineCount = lines.length;
-
-        // 1. Премахване от *command-map*
+        const initialLineCount = lines.length;
         const commandMapRegex = new RegExp(`^\\s*\\("${commandKey}"\\s+\\.\\s+"[^"]+"\\)`);
         lines = lines.filter(line => !commandMapRegex.test(line));
-
-        // 2. Премахване от списъка с ключове на секцията (*-command-keys*)
         const keyListRegex = new RegExp(`\\s*"${commandKey}"`);
         lines = lines.map(line => line.trim().startsWith('(setq *') && line.includes(`"${commandKey}"`) ? line.replace(keyListRegex, '') : line);
-
-        // 3. Премахване от `command_items` в съответната Lisp функция
         const commandItemRegex = new RegExp(`^\\s*\\("${commandKey}"\\s+`);
         lines = lines.filter(line => !commandItemRegex.test(line));
-
         if (lines.length === initialLineCount) {
-             updateStatus(`Команда с ключ '${commandKey}' не беше намерена на нито едно от трите места.`, 'error');
+             updateStatus(`Команда с ключ '${commandKey}' не беше намерена за изтриване.`, 'error');
              return null;
         }
-        
-        console.log(`Команда '${commandKey}' беше премахната успешно.`);
         return lines.join('\n');
     }
     
@@ -220,13 +231,13 @@ document.addEventListener('DOMContentLoaded', () => {
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
         if (!GITHUB_PAT) { updateStatus('Моля, въведете Personal Access Token (PAT).', 'error'); return; }
         appContent.classList.remove('hidden');
-        document.getElementById('command-summary').innerHTML = '<p class="loading">Зареждане...</p>';
+        const summary = document.getElementById('command-summary');
+        summary.innerHTML = '<p class="loading">Зареждане...</p>';
         const fileData = await getFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT);
         if (fileData) {
-            // Възстановяване на HTML структурата след зареждане, ако е била премахната
-            document.getElementById('command-summary').innerHTML = `<h2>Обобщение на командите</h2><p>Общо извлечени команди: <span id="command-count">0</span></p>`;
-            const { commands, sections } = parseLispContent(fileData.content);
-            displayCommands(commands, sections);
+            summary.innerHTML = `<h2>Обобщение на командите</h2><p>Общо извлечени команди: <span id="command-count">0</span></p>`;
+            lispData = parseLispContent(fileData.content); // Запазваме данните глобално
+            displayData(lispData); // Подаваме целия обект
         }
     });
 
@@ -241,6 +252,13 @@ document.addEventListener('DOMContentLoaded', () => {
             updateStatus('Моля, попълнете всички полета за новата команда.', 'error');
             return;
         }
+        
+        // ПРОВЕРКА ЗА ДУБЛИРАНЕ
+        if (lispData.commandMap && lispData.commandMap.hasOwnProperty(newCommand.key)) {
+            updateStatus(`Грешка: Команда с ключ '${newCommand.key}' вече съществува. Моля, изберете друго име.`, 'error');
+            return;
+        }
+
         updateStatus('Обработка... Моля, изчакайте.', 'success');
         const fileData = await getFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT);
         if (!fileData) return;
@@ -251,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (result) {
             updateStatus(`Командата '${newCommand.key}' е успешно добавена!`, 'success');
             addCommandForm.reset();
-            loadBtn.click(); // Презарежда данните и актуализира брояча
+            loadBtn.click();
         }
     });
 
@@ -275,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (result) {
             updateStatus(`Командата '${keyToDelete}' е успешно изтрита!`, 'success');
             document.getElementById('delete-command-key').value = '';
-            loadBtn.click(); // Презарежда данните и актуализира брояча
+            loadBtn.click();
         }
     });
 });
