@@ -38,10 +38,10 @@ button {
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s ease;
+    width: 100%; /* Бутоните да заемат цялата ширина */
 }
 button:hover { background-color: #0056b3; }
 
-/* Стилове за новия раздел с брояча */
 #command-summary {
     background-color: #e7f3ff;
     border-left: 5px solid #007bff;
@@ -54,16 +54,21 @@ button:hover { background-color: #0056b3; }
     margin-top: 0;
     padding-bottom: 5px;
 }
-#command-summary p {
-    margin: 0;
-    font-size: 1.1em;
-}
-#command-count {
-    font-weight: bold;
-    font-size: 1.2em;
+#command-summary p { margin: 0; font-size: 1.1em; }
+#command-count { font-weight: bold; font-size: 1.2em; }
+.hidden { display: none; }
+
+/* Ново: Стил за съобщенията във формите */
+.form-status-message {
+    display: none; /* Скрито по подразбиране */
+    margin-top: 15px; /* Отстояние от бутона */
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 0.95em;
+    text-align: center;
 }
 
-.hidden { display: none; }
+/* Общи стилове за съобщенията (глобални и във формите) */
 #status-message {
     margin-top: 20px;
     padding: 10px;
@@ -74,9 +79,5 @@ button:hover { background-color: #0056b3; }
 .status-error { background-color: #f8d7da; color: #721c24; }
 .loading { text-align: center; color: #666; padding: 20px; }
 
-.delete-btn {
-    background-color: #dc3545; /* Червен цвят за внимание */
-}
-.delete-btn:hover {
-    background-color: #c82333;
-}
+.delete-btn { background-color: #dc3545; }
+.delete-btn:hover { background-color: #c82333; }
