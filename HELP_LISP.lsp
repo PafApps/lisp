@@ -590,7 +590,6 @@
     ("СИВИЛ"       . "СИВИЛ")
     ("РЕГИСТРИ"    . "РЕГИСТРИ")
     ("d3t" . "d3t")
-    ("333333333333" . "333333333333")
 ;;; END COMMAND MAP
   )
 )
@@ -633,7 +632,7 @@
 ;;; END CIVIL KEYS
 
 ;;; START REGISTRI KEYS
-(setq *registri-command-keys* '("bExp" "pExp" "regV" "regH" "regC" "regS" "regS2" "regHro" "regVro" "regCro" "cPExp" "333333333333" "back"))
+(setq *registri-command-keys* '("bExp" "pExp" "regV" "regH" "regC" "regS" "regS2" "regHro" "regVro" "regCro" "cPExp" "back"))
 ;;; END REGISTRI KEYS
 
 
