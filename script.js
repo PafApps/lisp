@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // =======================================
 
     let GITHUB_PAT = '';
-    let lispData = { sections: [], commandMap: {} };
+    let lispData = { sections: [], commandMap: {}, uniqueCommandKeys: [] };
     
     // --- API Взаимодействие ---
     async function getFileContent(user, repo, path, token) {
@@ -45,55 +45,63 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Парсване ---
+    /**
+     * ПРОМЕНЕНА ФУНКЦИЯ: Парсва и веднага филтрира командите
+     */
     function parseLispContent(content) {
         const sections = [];
         const lines = content.split('\n');
+        
+        // 1. Намиране на всички секции
         const sectionRegex = /;;; START (.*?) KEYS/;
-        const commandMapRegex = /\("([^"]+)"\s+\.\s+"([^"]+)"\)/;
-        let commandMap = {};
-        let inCommandMapBlock = false;
-        lines.forEach(line => {
-            if (line.includes('(setq *command-map*')) inCommandMapBlock = true;
-            if (inCommandMapBlock) {
-                const match = line.match(commandMapRegex);
-                if (match) commandMap[match[1]] = match[2];
-                if (line.trim() === ')') inCommandMapBlock = false;
-            }
-        });
         for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-            const sectionMatch = line.match(sectionRegex);
+            const sectionMatch = lines[i].match(sectionRegex);
             if (sectionMatch && sectionMatch[1]) {
                 const sectionNameRaw = sectionMatch[1].trim();
                 const sectionName = sectionNameRaw.charAt(0).toUpperCase() + sectionNameRaw.slice(1).toLowerCase();
-                if (!sections.includes(sectionName)) sections.push(sectionName);
+                if (!sections.includes(sectionName)) {
+                    sections.push(sectionName);
+                }
             }
         }
-        return { sections, commandMap };
+
+        // 2. Намиране и филтриране на command-map
+        const commandMapRegex = /\(\s*"([^"]+)"\s*\.\s*"[^"]*"\s*\)/g;
+        const commandMapSectionMatch = content.match(/;;; START COMMAND MAP([\s\S]*?);;; END COMMAND MAP/);
+        
+        const commandMap = {};
+        const uniqueCommandKeys = new Set();
+
+        if (commandMapSectionMatch) {
+            const mapContent = commandMapSectionMatch[1];
+            let match;
+            while ((match = commandMapRegex.exec(mapContent)) !== null) {
+                const key = match[1];
+                commandMap[key] = key; // Попълваме пълния commandMap за проверките
+                
+                // *** КЛЮЧОВА ЛОГИКА ЗА ФИЛТРИРАНЕ (като в примера) ***
+                // Изключваме 'back', 'pps_back', 'help' и всичко, започващо с буква на кирилица (имената на категориите)
+                const isCyrillic = /^[А-Яа-я]/.test(key);
+                const isExcludedWord = ['back', 'pps_back', 'help'].includes(key.toLowerCase());
+                
+                if (!isCyrillic && !isExcludedWord) {
+                    uniqueCommandKeys.add(key);
+                }
+            }
+        }
+        
+        return { sections, commandMap, uniqueCommandKeys: Array.from(uniqueCommandKeys) };
     }
     
     // --- Визуализация ---
     const sectionToCyrillic = { "Main": "Раздели", "Situacia": "Ситуация", "Naprechni": "Напречни", "Nadlazhni": "Надлъжни", "Blokove": "Блокове", "Layouts": "Лейаути", "Drugi": "Други", "Civil": "Civil", "Registri": "Регистри" };
     
-    /**
-     * ПРОМЕНЕНА ФУНКЦИЯ: Показва данни и филтрира броя на командите
-     */
-    function displayData({ sections, commandMap }) {
-        const commandCountSpan = document.getElementById('command-count');
-        const sectionSelect = document.getElementById('command-section');
-
-        // *** НОВО: Списък с ключове, които да бъдат изключени от общия брой ***
-        const excludedKeys = ['help', 'back', 'ситуация', 'напречни', 'надлъжни', 'блокове'];
-
-        // Филтрираме ключовете от commandMap
-        const allKeys = Object.keys(commandMap);
-        const filteredKeys = allKeys.filter(key => !excludedKeys.includes(key.toLowerCase()));
-
+    function displayData({ sections, uniqueCommandKeys }) {
         // Показваме броя на филтрираните команди
-        commandCountSpan.textContent = filteredKeys.length;
+        document.getElementById('command-count').textContent = uniqueCommandKeys.length;
 
-        // Попълваме падащото меню със секции (без промяна тук)
+        // Попълваме падащото меню със секции
+        const sectionSelect = document.getElementById('command-section');
         sectionSelect.innerHTML = '<option value="" disabled selected>Избери секция...</option>';
         sections.filter(s => s.toLowerCase() !== 'main').forEach(section => {
             const option = document.createElement('option');
@@ -164,9 +172,9 @@ document.addEventListener('DOMContentLoaded', () => {
         summary.innerHTML = '<p class="loading">Зареждане...</p>';
         const fileData = await getFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT);
         if (fileData) {
-            summary.innerHTML = `<h2>Обобщение на командите</h2><p>Общо команди: <span id="command-count">0</span></p>`;
-            lispData = parseLispContent(fileData.content);
-            displayData(lispData);
+            summary.innerHTML = `<h2>Обобщение на командите</h2><p>Общо уникални команди: <span id="command-count">0</span></p>`;
+            lispData = parseLispContent(fileData.content); // Парсваме и филтрираме
+            displayData(lispData); // Показваме новите данни
         }
     });
 
