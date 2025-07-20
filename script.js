@@ -93,23 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Модификация на съдържание ---
     const sectionToKeyMap = { "MAIN": "MAIN", "SITUACIA": "SITUACIA", "NAPRECHNI": "NAPRECHNI", "NADLAZHNI": "NADLAZHNI", "BLOKOVE": "BLOKOVE", "LAYOUTS": "LAYOUTS", "DRUGI": "DRUGI", "CIVIL": "CIVIL", "REGISTRI": "REGISTRI" };
     const keyToLispFuncMap = { "SITUACIA": "СИТУАЦИЯ", "NAPRECHNI": "НАПРЕЧНИ", "NADLAZHNI": "НАДЛЪЖНИ", "BLOKOVE": "БЛОКОВЕ", "LAYOUTS": "ЛЕЙАУТИ", "DRUGI": "ДРУГИ", "CIVIL": "СИВИЛ", "REGISTRI": "РЕГИСТРИ" };
-
-    /**
-     * *** КОРЕГИРАНА ФУНКЦИЯ ***
-     */
     function addNewCommandToContent(originalContent, newCommand) {
         let lines = originalContent.split('\n');
-
-        // *** КОРЕКЦИЯ 1: Намираме маркера за край и вмъкваме ПРЕДИ него ***
         const commandMapEndMarker = ';;; END COMMAND MAP';
         let commandMapEndIndex = lines.findIndex(line => line.includes(commandMapEndMarker));
-        if (commandMapEndIndex === -1) {
-             updateStatus('Грешка: Не е намерен маркер ;;; END COMMAND MAP.', 'error', 'add-status-message');
-             return null;
-        }
-        const newCommandMapEntry = `    ("${newCommand.key}" . "${newCommand.key}")`;
-        lines.splice(commandMapEndIndex, 0, newCommandMapEntry); // Вмъкваме на реда ПРЕДИ маркера
-
+        if (commandMapEndIndex === -1) { updateStatus('Грешка: Не е намерен маркер ;;; END COMMAND MAP.', 'error', 'add-status-message'); return null; }
+        lines.splice(commandMapEndIndex, 0, `    ("${newCommand.key}" . "${newCommand.key}")`);
         const sectionKeyName = sectionToKeyMap[newCommand.section.toUpperCase()];
         const sectionKeysStartMarker = `(setq *${sectionKeyName.toLowerCase()}-command-keys*`;
         let sectionKeysLineIndex = lines.findIndex(line => line.trim().startsWith(sectionKeysStartMarker));
@@ -118,35 +107,54 @@ document.addEventListener('DOMContentLoaded', () => {
         const backIndex = lineToModify.lastIndexOf('"back"');
         if (backIndex > -1) lines[sectionKeysLineIndex] = lineToModify.substring(0, backIndex) + `"${newCommand.key}" ` + lineToModify.substring(backIndex);
         else return null;
-        
         const lispFuncName = keyToLispFuncMap[newCommand.section.toUpperCase()];
         const functionStartMarker = `defun create_dclhelplisp${lispFuncName}`;
         let functionStartIndex = lines.findIndex(line => line.includes(functionStartMarker));
         if (functionStartIndex === -1) return null;
-        
         let commandItemsEndIndex = -1, inItems = false;
         for (let i = functionStartIndex; i < lines.length; i++) {
             if (lines[i].includes('(setq command_items')) { inItems = true; continue; }
             if (inItems && lines[i].trim() === ')') { commandItemsEndIndex = i; break; }
         }
         if (commandItemsEndIndex > -1) {
-             // *** КОРЕКЦИЯ 2: Премахваме излишните интервали около втория елемент ***
             const newLispEntry = `      ("${newCommand.key}" "${newCommand.key}" "  - ${newCommand.label}")`;
             lines.splice(commandItemsEndIndex, 0, newLispEntry);
-        } else {
-             return null;
-        }
-        
+        } else { return null; }
         return lines.join('\n');
     }
 
+    /**
+     * *** КОРЕГИРАНА ФУНКЦИЯ ***
+     */
     function removeCommandFromContent(originalContent, commandKey) {
         let lines = originalContent.split('\n');
-        lines = lines.filter(line => !new RegExp(`^\\s*\\("${commandKey}"\\s+\\.\\s+"[^"]+"\\)`).test(line));
-        lines = lines.map(line => line.replace(new RegExp(`\\s*"${commandKey}"`), ''));
-        lines = lines.filter(line => !new RegExp(`^\\s*\\("${commandKey}"\\s+`).test(line));
+        const originalLength = originalContent.length;
+
+        // 1. Премахване от *command-map*
+        const commandMapRegex = new RegExp(`^\\s*\\("${commandKey}"\\s+\\.\\s+"[^"]+"\\)`);
+        lines = lines.filter(line => !commandMapRegex.test(line));
+
+        // 2. Премахване от списъка с ключове на секцията (*-command-keys*)
+        const keyListRegex = new RegExp(`\\s*"${commandKey}"`);
+        lines = lines.map(line => {
+            // КОРЕКЦИЯ: Извършваме замяната само на редовете, които дефинират списък с ключове
+            if (line.trim().startsWith('(setq *') && line.includes('-command-keys*')) {
+                return line.replace(keyListRegex, '');
+            }
+            return line;
+        });
+
+        // 3. Премахване от `command_items` в съответната DCL функция
+        const commandItemRegex = new RegExp(`^\\s*\\("${commandKey}"\\s+`);
+        lines = lines.filter(line => !commandItemRegex.test(line));
+
         const newContent = lines.join('\n');
-        if (newContent.length === originalContent.length) return null;
+
+        // Проверка дали нещо е изтрито
+        if (newContent.length >= originalLength) {
+            return null;
+        }
+
         return newContent;
     }
 
