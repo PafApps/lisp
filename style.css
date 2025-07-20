@@ -41,46 +41,28 @@ button {
 }
 button:hover { background-color: #0056b3; }
 
-/* Сгъваеми секции */
-details {
-    border: 1px solid #e1e4e8;
-    border-radius: 6px;
-    margin-bottom: 10px;
-    padding: 5px;
+/* Стилове за новия раздел с брояча */
+#command-summary {
+    background-color: #e7f3ff;
+    border-left: 5px solid #007bff;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-radius: 4px;
 }
-summary {
+#command-summary h2 {
+    border-bottom: none;
+    margin-top: 0;
+    padding-bottom: 5px;
+}
+#command-summary p {
+    margin: 0;
+    font-size: 1.1em;
+}
+#command-count {
     font-weight: bold;
     font-size: 1.2em;
-    padding: 10px;
-    cursor: pointer;
-    outline: none;
-    color: #0366d6;
 }
-.command-entry {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 10px;
-    border-top: 1px solid #eee;
-}
-.copy-btn {
-    padding: 5px 10px;
-    font-size: 12px;
-    background-color: #6c757d;
-    flex-shrink: 0;
-}
-.copy-btn:hover { background-color: #5a6268; }
-code {
-    background-color: #eef;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-    color: #333;
-}
-.command-entry p {
-    margin: 0;
-    color: #555;
-}
+
 .hidden { display: none; }
 #status-message {
     margin-top: 20px;
