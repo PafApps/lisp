@@ -591,7 +591,6 @@
     ("СИВИЛ"       . "СИВИЛ")
     ("РЕГИСТРИ"    . "РЕГИСТРИ")
     ("d3t" . "d3t")
-    ("33333" . "33333")
     ("333333333" . "333333333")
     ("3333333333" . "3333333333")
     ("33333333333" . "33333333333")
@@ -622,7 +621,7 @@
 ;;; END NADLAZHNI KEYS
 
 ;;; START BLOKOVE KEYS
-(setq *blokove-command-keys* '("km" "qe" "qec" "addtoblock" "ndel" "ncut" "nmove" "delblocks" "wfb" "33333" "back"))
+(setq *blokove-command-keys* '("km" "qe" "qec" "addtoblock" "ndel" "ncut" "nmove" "delblocks" "wfb" "back"))
 ;;; END BLOKOVE KEYS
 
 ;;; START LAYOUTS KEYS
