@@ -11,9 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // =======================================
 
     let GITHUB_PAT = '';
-    let lispData = { commands: [], sections: [], commandMap: {} };
+    let lispData = { sections: [], commandMap: {} };
     
-    // --- API Взаимодействие (без промяна) ---
+    // --- API Взаимодействие ---
     async function getFileContent(user, repo, path, token) {
         try {
             const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             return { content: decodeURIComponent(escape(atob(data.content))), sha: data.sha };
         } catch (error) {
-            updateStatus(`Грешка: ${error.message}`, 'error'); // Глобално съобщение
+            updateStatus(`Мрежова грешка: ${error.message}. Проверете интернет връзката си.`, 'error');
             return null;
         }
     }
@@ -39,14 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) { const errorData = await response.json(); throw new Error(`Грешка при запис: ${errorData.message}`); }
             return await response.json();
         } catch (error) {
-            // Грешката при запис ще се покаже в съответната форма
             const statusElementId = commitMessage.includes('Добавена') ? 'add-status-message' : 'delete-status-message';
             updateStatus(`Грешка при запис: ${error.message}`, 'error', statusElementId);
             return null;
         }
     }
 
-    // --- Парсване (без промяна) ---
+    // --- Парсване ---
     function parseLispContent(content) {
         const sections = [];
         const lines = content.split('\n');
@@ -74,12 +73,27 @@ document.addEventListener('DOMContentLoaded', () => {
         return { sections, commandMap };
     }
     
-    // --- Визуализация (без промяна) ---
+    // --- Визуализация ---
     const sectionToCyrillic = { "Main": "Раздели", "Situacia": "Ситуация", "Naprechni": "Напречни", "Nadlazhni": "Надлъжни", "Blokove": "Блокове", "Layouts": "Лейаути", "Drugi": "Други", "Civil": "Civil", "Registri": "Регистри" };
+    
+    /**
+     * ПРОМЕНЕНА ФУНКЦИЯ: Показва данни и филтрира броя на командите
+     */
     function displayData({ sections, commandMap }) {
         const commandCountSpan = document.getElementById('command-count');
-        commandCountSpan.textContent = Object.keys(commandMap).length;
         const sectionSelect = document.getElementById('command-section');
+
+        // *** НОВО: Списък с ключове, които да бъдат изключени от общия брой ***
+        const excludedKeys = ['help', 'back', 'ситуация', 'напречни', 'надлъжни', 'блокове'];
+
+        // Филтрираме ключовете от commandMap
+        const allKeys = Object.keys(commandMap);
+        const filteredKeys = allKeys.filter(key => !excludedKeys.includes(key.toLowerCase()));
+
+        // Показваме броя на филтрираните команди
+        commandCountSpan.textContent = filteredKeys.length;
+
+        // Попълваме падащото меню със секции (без промяна тук)
         sectionSelect.innerHTML = '<option value="" disabled selected>Избери секция...</option>';
         sections.filter(s => s.toLowerCase() !== 'main').forEach(section => {
             const option = document.createElement('option');
@@ -99,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(lines[i].includes('(setq *command-map*')) inMap = true;
             if(inMap && lines[i].trim() === ')') { commandMapEndIndex = i; break; }
         }
-        if (commandMapEndIndex === -1) return null; // Грешка ще се обработи отвън
+        if (commandMapEndIndex === -1) return null;
         lines.splice(commandMapEndIndex, 0, `    ("${newCommand.key}" . "${newCommand.key}")`);
         const sectionKeyName = sectionToKeyMap[newCommand.section.toUpperCase()];
         const sectionKeysStartMarker = `(setq *${sectionKeyName.toLowerCase()}-command-keys*`;
@@ -124,28 +138,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     function removeCommandFromContent(originalContent, commandKey) {
         let lines = originalContent.split('\n');
-        const initialLineCount = lines.length;
         lines = lines.filter(line => !new RegExp(`^\\s*\\("${commandKey}"\\s+\\.\\s+"[^"]+"\\)`).test(line));
         lines = lines.map(line => line.replace(new RegExp(`\\s*"${commandKey}"`), ''));
         lines = lines.filter(line => !new RegExp(`^\\s*\\("${commandKey}"\\s+`).test(line));
-        if (lines.join('\n').length === originalContent.length) return null;
-        return lines.join('\n');
+        const newContent = lines.join('\n');
+        if (newContent.length === originalContent.length) return null;
+        return newContent;
     }
 
-    /**
-     * ПРОМЕНЕНА ФУНКЦИЯ: Показва съобщение в определен елемент.
-     * @param {string} message - Текстът на съобщението.
-     * @param {'success'|'error'} type - Типът на съобщението.
-     * @param {string} [elementId='status-message'] - ID на елемента, в който да се покаже.
-     */
     function updateStatus(message, type, elementId = 'status-message') {
         const statusDiv = document.getElementById(elementId);
         if (!statusDiv) return;
-
         statusDiv.className = `form-status-message status-${type}`;
         statusDiv.textContent = message;
         statusDiv.style.display = 'block';
-
         setTimeout(() => { statusDiv.style.display = 'none'; }, 5000);
     }
     
@@ -158,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
         summary.innerHTML = '<p class="loading">Зареждане...</p>';
         const fileData = await getFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT);
         if (fileData) {
-            summary.innerHTML = `<h2>Обобщение на командите</h2><p>Общо извлечени команди: <span id="command-count">0</span></p>`;
+            summary.innerHTML = `<h2>Обобщение на командите</h2><p>Общо команди: <span id="command-count">0</span></p>`;
             lispData = parseLispContent(fileData.content);
             displayData(lispData);
         }
@@ -166,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     addCommandForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const statusId = 'add-status-message'; // Дефинираме ID за съобщенията на тази форма
+        const statusId = 'add-status-message';
         const newCommand = {
             section: document.getElementById('command-section').value,
             key: document.getElementById('command-key').value.trim(),
@@ -203,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     deleteCommandForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const statusId = 'delete-status-message'; // Дефинираме ID за съобщенията на тази форма
+        const statusId = 'delete-status-message';
         const keyToDelete = document.getElementById('delete-command-key').value.trim();
 
         if (!keyToDelete) {
