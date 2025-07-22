@@ -335,6 +335,7 @@
       ("regAttAll" "regAttAll" "  - Изкарва всички атрибути заедно с координатите на блока")
       ("pcoord" "pcoord" "  - В аутокад изкарваш във файл координати на посочени от теб точки, като също ги именуваш една по една")
       ("rtl" "RTL" "  - върти TEXT и MTEXT спрямо линия или полилиния")
+      ("askGemini" "askGemini" "  - пишеш в ноутпат въпрос към AI Gemini - той ти връща отговор отново в Notepad. Ползва по-стар модел gemini-1.5")
     )
   )
   ;;; END DCL DRUGI ITEMS
@@ -590,6 +591,7 @@
     ("СИВИЛ"       . "СИВИЛ")
     ("РЕГИСТРИ"    . "РЕГИСТРИ")
     ("d3t" . "d3t")
+    ("askGemini" . "askGemini")
 ;;; END COMMAND MAP
   )
 )
@@ -624,7 +626,7 @@
 ;;; END LAYOUTS KEYS
 
 ;;; START DRUGI KEYS
-(setq *drugi-command-keys* '("ETR" "BATCHETR" "BATCHPDF" "BATCHPDF2" "getv" "getversions" "meters" "BS" "SHOWLAYERS" "kmAll" "kmDel" "template" "LayerChange" "regAttAll" "pcoord" "rtl" "back"))
+(setq *drugi-command-keys* '("ETR" "BATCHETR" "BATCHPDF" "BATCHPDF2" "getv" "getversions" "meters" "BS" "SHOWLAYERS" "kmAll" "kmDel" "template" "LayerChange" "regAttAll" "pcoord" "rtl" "askGemini" "back"))
 ;;; END DRUGI KEYS
 
 ;;; START CIVIL KEYS
