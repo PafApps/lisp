@@ -370,6 +370,7 @@
       ("GRR2" "GRR2" "  - Като GRR само, че тук се маркират самите точки и когато имаме големи криви трябва да се прави на части, защото при голямо закръгление дава грешки - да се коригира Bounderyto")
       ("cPExp" "cPExp" "  - Изкарва регистър на реперите от сивилски точки. Маркира се алаймънт и всички сивилски точки")
       ("Bazovi" "Bazovi" "  - В сивил сменя базовите коти на много профили наведнъж, като му задаваш разстоянието от кота глава релса до базовата кота")
+      ("RamkaLR" "RamkaLR" "  - Мести напречните профили в ляво и дясно, като го правиш за повече профили едновременно и с по-голяма стойност")
     )
   )
   ;;; END DCL CIVIL ITEMS
@@ -596,6 +597,7 @@
     ("askGemini" . "askGemini")
     ("BK" . "BK")
     ("Bazovi" . "Bazovi")
+    ("RamkaLR" . "RamkaLR")
 ;;; END COMMAND MAP
   )
 )
@@ -634,7 +636,7 @@
 ;;; END DRUGI KEYS
 
 ;;; START CIVIL KEYS
-(setq *civil-command-keys* '("slg" "s2p" "s2f" "flkm" "bExp" "bExp2" "pExp" "regV" "regH" "regC" "regS" "kmATT" "GRR" "GRR2" "cPExp" "Bazovi" "back"))
+(setq *civil-command-keys* '("slg" "s2p" "s2f" "flkm" "bExp" "bExp2" "pExp" "regV" "regH" "regC" "regS" "kmATT" "GRR" "GRR2" "cPExp" "Bazovi" "RamkaLR" "back"))
 ;;; END CIVIL KEYS
 
 ;;; START REGISTRI KEYS
