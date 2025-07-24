@@ -359,6 +359,7 @@
       ("pcoord" "pcoord" "  - В аутокад изкарваш във файл координати на посочени от теб точки, като също ги именуваш една по една")
       ("rtl" "RTL" "  - върти TEXT и MTEXT спрямо линия или полилиния")
       ("askGemini" "askGemini" "  - пишеш в ноутпат въпрос към AI Gemini - той ти връща отговор отново в Notepad. Ползва по-стар модел gemini-1.5")
+      ("iskam" "iskam" "  - Добавя предложение/желание за нова команда или функционалност в сайта на програмите")
     )
   )
   ;;; END DCL DRUGI ITEMS
@@ -622,6 +623,7 @@
     ("Bazovi" . "Bazovi")
     ("RamkaLR" . "RamkaLR")
     ("RWCedit" . "RWCedit")
+    ("iskam" . "iskam")
 ;;; END COMMAND MAP
   )
 )
@@ -656,7 +658,7 @@
 ;;; END LAYOUTS KEYS
 
 ;;; START DRUGI KEYS
-(setq *drugi-command-keys* '("ETR" "BATCHETR" "BATCHPDF" "BATCHPDF2" "getv" "getversions" "meters" "BS" "SHOWLAYERS" "kmAll" "kmDel" "template" "LayerChange" "regAttAll" "pcoord" "rtl" "askGemini" "back"))
+(setq *drugi-command-keys* '("ETR" "BATCHETR" "BATCHPDF" "BATCHPDF2" "getv" "getversions" "meters" "BS" "SHOWLAYERS" "kmAll" "kmDel" "template" "LayerChange" "regAttAll" "pcoord" "rtl" "askGemini" "iskam" "back"))
 ;;; END DRUGI KEYS
 
 ;;; START CIVIL KEYS
