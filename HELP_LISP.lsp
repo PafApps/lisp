@@ -360,6 +360,7 @@
       ("rtl" "RTL" "  - върти TEXT и MTEXT спрямо линия или полилиния")
       ("askGemini" "askGemini" "  - пишеш в ноутпат въпрос към AI Gemini - той ти връща отговор отново в Notepad. Ползва по-стар модел gemini-1.5")
       ("iskam" "iskam" "  - Добавя предложение/желание за нова команда или функционалност в сайта на програмите")
+      ("CUIPAF" "CUIPAF" "  - При ON заменя бутоните F1 - с отваряне на страницата с командите в PPS и F5 - с командата LISPLOAD. При OFF връща старите команди. Добавя и меню с команди")
     )
   )
   ;;; END DCL DRUGI ITEMS
@@ -624,6 +625,7 @@
     ("RamkaLR" . "RamkaLR")
     ("RWCedit" . "RWCedit")
     ("iskam" . "iskam")
+    ("CUIPAF" . "CUIPAF")
 ;;; END COMMAND MAP
   )
 )
@@ -658,7 +660,7 @@
 ;;; END LAYOUTS KEYS
 
 ;;; START DRUGI KEYS
-(setq *drugi-command-keys* '("ETR" "BATCHETR" "BATCHPDF" "BATCHPDF2" "getv" "getversions" "meters" "BS" "SHOWLAYERS" "kmAll" "kmDel" "template" "LayerChange" "regAttAll" "pcoord" "rtl" "askGemini" "iskam" "back"))
+(setq *drugi-command-keys* '("ETR" "BATCHETR" "BATCHPDF" "BATCHPDF2" "getv" "getversions" "meters" "BS" "SHOWLAYERS" "kmAll" "kmDel" "template" "LayerChange" "regAttAll" "pcoord" "rtl" "askGemini" "iskam" "CUIPAF" "back"))
 ;;; END DRUGI KEYS
 
 ;;; START CIVIL KEYS
