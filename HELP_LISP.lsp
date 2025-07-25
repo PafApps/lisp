@@ -209,6 +209,7 @@
       ("wf" "wf" "  - Променя width factor на избран/и текстови обекти")
       ("wfb" "wfb" "  - Променя width factor на текст, който се намира в блок")
       ("DIt" "DIt" "  - Измерва разстоянието между две точки и го записва в избран TEXT или MTEXT")
+      ("LNi" "LNi" "  - Избираш вертикален мащаб (1:1 , 1:10, 1:100) и мерни единици (проценти или промили) и чертаеш линия на която можеш да сменяш наклона преди да си маркирал втората точка. С + и - или със Space и число показваш какъв наклон да е линията")
     )
   )
   ;;; END DCL NADLZHNI ITEMS
@@ -626,6 +627,7 @@
     ("RWCedit" . "RWCedit")
     ("iskam" . "iskam")
     ("CUIPAF" . "CUIPAF")
+    ("LNi" . "LNi")
 ;;; END COMMAND MAP
   )
 )
@@ -648,7 +650,7 @@
 ;;; END NAPRECHNI KEYS
 
 ;;; START NADLAZHNI KEYS
-(setq *nadlazhni-command-keys* '("km" "vpo" "qe" "qec" "Ln" "addtoblock" "ndel" "ncut" "nmove" "delblocks" "calc" "wf" "wfb" "DIt" "back"))
+(setq *nadlazhni-command-keys* '("km" "vpo" "qe" "qec" "Ln" "addtoblock" "ndel" "ncut" "nmove" "delblocks" "calc" "wf" "wfb" "DIt" "LNi" "back"))
 ;;; END NADLAZHNI KEYS
 
 ;;; START BLOKOVE KEYS
