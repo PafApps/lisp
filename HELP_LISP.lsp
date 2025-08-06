@@ -179,6 +179,7 @@
       ("Bind-Detach" "Bind-Detach" "  -  	- вкарва заредените xref-ове във файла като блокове, а незаредените ги детачва")
       ("MTB" "MTB" "  -  	- същото като MTA, но за блокове.")
       ("WWD" "WWD" "  - Обратна команда на WW. Пренасяш обекти от ситуация в напречен профил. Всичко се случва в един файл")
+      ("WWS" "WWS" "  - Тази команда в комбинация с WWC е същата като WWD, само че тук работим в два отделни файла. Първо във файла със ситуация с командата WWS взимаме оффсет на обектите за дадена семпъл линия и след това във файла с напречните профили с командата WWC пренасяме оффсетите им в конкретния напречен профил")
     )
   )
   ;;; END DCL SITUACIA ITEMS
@@ -630,6 +631,7 @@
     ("CUIPAF" . "CUIPAF")
     ("LNi" . "LNi")
     ("WWD" . "WWD")
+    ("WWS" . "WWS")
 ;;; END COMMAND MAP
   )
 )
@@ -644,7 +646,7 @@
 ;;; END MAIN KEYS
 
 ;;; START SITUACIA KEYS
-(setq *situacia-command-keys* '("km" "slope" "vpo" "dims" "qe" "qec" "addtoblock" "ndel" "ncut" "nmove" "label" "delblocks" "ww" "calc" "wf" "wfb" "DIt" "etr" "etr1" "PJ" "STRELKA" "loadlineM" "tkm" "MTA" "Bind-Detach" "MTB" "WWD" "back"))
+(setq *situacia-command-keys* '("km" "slope" "vpo" "dims" "qe" "qec" "addtoblock" "ndel" "ncut" "nmove" "label" "delblocks" "ww" "calc" "wf" "wfb" "DIt" "etr" "etr1" "PJ" "STRELKA" "loadlineM" "tkm" "MTA" "Bind-Detach" "MTB" "WWD" "WWS" "back"))
 ;;; END SITUACIA KEYS
 
 ;;; START NAPRECHNI KEYS
