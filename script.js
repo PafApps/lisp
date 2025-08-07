@@ -96,10 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const { section, key, label } = newCommand;
         const autocadCommand = key;
         const categoryInfo = categoryConfig[section];
-        if (!categoryInfo) {
-            updateStatus('Избраната секция не е валидна.', 'error', 'add-status-message');
-            return null;
-        }
+        if (!categoryInfo) return null;
 
         let lines = originalContent.split('\n');
         
@@ -112,9 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         let lastItemIndex = endMarkerIndex - 1;
-        while(lastItemIndex > 0 && lines[lastItemIndex].trim() === '') {
-            lastItemIndex--;
-        }
+        while(lastItemIndex > 0 && lines[lastItemIndex].trim() === '') lastItemIndex--;
         
         if (lines[lastItemIndex] && lines[lastItemIndex].trim().endsWith('}')) {
             lines[lastItemIndex] += ',';
@@ -131,10 +126,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         let lastMapIndex = commandMapEndIndex - 1;
-        while(lastMapIndex > 0 && lines[lastMapIndex].trim() === '') {
-            lastMapIndex--;
-        }
-        
+        while(lastMapIndex > 0 && lines[lastMapIndex].trim() === '') lastMapIndex--;
+
         if (lines[lastMapIndex] && lines[lastMapIndex].trim().endsWith('}')) {
             lines[lastMapIndex] += ',';
         }
@@ -150,21 +143,16 @@ document.addEventListener('DOMContentLoaded', () => {
         let linesChanged = false;
 
         // --- Логика за MenuItem ---
-        const menuItemLineIndex = lines.findIndex(line =>
-            line.includes('new MenuItem') && line.includes(`Key = "${commandKey}"`)
-        );
+        const menuItemLineIndex = lines.findIndex(line => line.includes(`Key = "${commandKey}"`));
 
         if (menuItemLineIndex !== -1) {
             const lineToRemove = lines[menuItemLineIndex];
-            lines.splice(menuItemLineIndex, 1); // Изтриваме реда
+            lines.splice(menuItemLineIndex, 1);
             
-            // Ако изтритият ред е бил последен в списъка (нямал е запетая),
-            // тогава трябва да премахнем запетаята от новия последен ред.
             if (!lineToRemove.trim().endsWith(',')) {
                  let newLastItemIndex = menuItemLineIndex - 1;
-                 while(newLastItemIndex > 0 && lines[newLastItemIndex].trim() === '') {
-                     newLastItemIndex--;
-                 }
+                 while(newLastItemIndex > 0 && lines[newLastItemIndex].trim() === '') newLastItemIndex--;
+                 
                  if (lines[newLastItemIndex] && lines[newLastItemIndex].trim().endsWith('},')) {
                     lines[newLastItemIndex] = lines[newLastItemIndex].trim().slice(0, -1);
                  }
@@ -173,19 +161,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // --- Логика за CommandMap ---
-        const commandMapLineIndex = lines.findIndex(line =>
-            line.trim().startsWith(`{ "${commandKey}"`)
-        );
+        const commandMapLineIndex = lines.findIndex(line => line.trim().startsWith(`{ "${commandKey}"`));
 
         if (commandMapLineIndex !== -1) {
             const lineToRemove = lines[commandMapLineIndex];
-            lines.splice(commandMapLineIndex, 1); // Изтриваме реда
+            lines.splice(commandMapLineIndex, 1);
             
             if (!lineToRemove.trim().endsWith(',')) {
                  let newLastMapIndex = commandMapLineIndex - 1;
-                 while(newLastMapIndex > 0 && lines[newLastMapIndex].trim() === '') {
-                     newLastMapIndex--;
-                 }
+                 while(newLastMapIndex > 0 && lines[newLastMapIndex].trim() === '') newLastMapIndex--;
+
                  if (lines[newLastMapIndex] && lines[newLastMapIndex].trim().endsWith('},')) {
                     lines[newLastMapIndex] = lines[newLastMapIndex].trim().slice(0, -1);
                  }
@@ -193,11 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
             linesChanged = true;
         }
 
-        if (!linesChanged) {
-            return null;
-        }
-
-        return lines.join('\n');
+        return linesChanged ? lines.join('\n') : null;
     }
 
     function updateStatus(message, type, elementId = 'status-message') {
