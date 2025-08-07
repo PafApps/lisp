@@ -102,19 +102,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         let lines = originalContent.split('\n');
-        const marker = categoryInfo.markerName;
         
         // 1. Добавяне на MenuItem
-        const endMarkerIndex = lines.findIndex(line => line.includes(`END DCL ${marker} ITEMS`));
+        const marker = categoryInfo.markerName;
+        const endMarkerIndex = lines.findIndex(line => line.includes(`;;; END DCL ${marker} ITEMS`));
         if (endMarkerIndex !== -1) {
             const newMenuItem = `                new MenuItem { Key = "${key}", Label = "${key}", Description = "- ${label}", AutoCADCommand = "${autocadCommand}" }`;
-            // Намираме предишния ред и проверяваме дали завършва със запетая
             let previousLineIndex = endMarkerIndex - 1;
             while(previousLineIndex > 0 && lines[previousLineIndex].trim() === '') {
                 previousLineIndex--;
             }
-            if(lines[previousLineIndex].trim().endsWith('}')) {
-                lines[previousLineIndex] = lines[previousLineIndex] + ',';
+            if (lines[previousLineIndex] && lines[previousLineIndex].trim().endsWith('}')) {
+                lines[previousLineIndex] += ',';
             }
             lines.splice(endMarkerIndex, 0, newMenuItem);
         } else {
@@ -123,9 +122,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // 2. Добавяне в CommandMap
-        const commandMapEndIndex = lines.findIndex(line => line.includes('END COMMAND MAP'));
+        const commandMapEndIndex = lines.findIndex(line => line.includes(';;; END COMMAND MAP'));
         if(commandMapEndIndex !== -1) {
-             const newMapEntry = `            { "${key}", "${autocadCommand}" },`;
+            const newMapEntry = `            { "${key}", "${autocadCommand}" }`;
+             let previousLineIndex = commandMapEndIndex - 1;
+             while(previousLineIndex > 0 && lines[previousLineIndex].trim() === '') {
+                previousLineIndex--;
+            }
+            if (lines[previousLineIndex] && lines[previousLineIndex].trim().endsWith('}')) {
+                lines[previousLineIndex] += ',';
+            }
              lines.splice(commandMapEndIndex, 0, newMapEntry);
         } else {
             updateStatus('Грешка: Не е намерен маркер за край на CommandMap.', 'error', 'add-status-message');
@@ -146,15 +152,14 @@ document.addEventListener('DOMContentLoaded', () => {
         );
 
         if (menuItemLineIndex !== -1) {
-            // Проверяваме дали предният ред трябва да остане без запетая
             const lineToRemove = lines[menuItemLineIndex];
-            if (lineToRemove.trim().endsWith('},')) {
+            if (!lineToRemove.trim().endsWith(',')) {
                  let previousLineIndex = menuItemLineIndex - 1;
                  while(previousLineIndex > 0 && lines[previousLineIndex].trim() === '') {
                      previousLineIndex--;
                  }
                  if (lines[previousLineIndex] && lines[previousLineIndex].trim().endsWith('},')) {
-                    lines[previousLineIndex] = lines[previousLineIndex].slice(0, -1);
+                    lines[previousLineIndex] = lines[previousLineIndex].trim().slice(0, -1);
                  }
             }
             lines.splice(menuItemLineIndex, 1);
@@ -167,6 +172,16 @@ document.addEventListener('DOMContentLoaded', () => {
         );
 
         if (commandMapLineIndex !== -1) {
+            const lineToRemove = lines[commandMapLineIndex];
+             if (!lineToRemove.trim().endsWith(',')) {
+                 let previousLineIndex = commandMapLineIndex - 1;
+                 while(previousLineIndex > 0 && lines[previousLineIndex].trim() === '') {
+                     previousLineIndex--;
+                 }
+                 if (lines[previousLineIndex] && lines[previousLineIndex].trim().endsWith('},')) {
+                    lines[previousLineIndex] = lines[previousLineIndex].trim().slice(0, -1);
+                 }
+            }
             lines.splice(commandMapLineIndex, 1);
             linesChanged = true;
         }
