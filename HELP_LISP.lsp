@@ -73,7 +73,6 @@ namespace PpsMenu
                 new MenuItem { Key = "MTB", Label = "MTB", Description = "- същото като MTA, но за блокове.", AutoCADCommand = "MTB" },
                 new MenuItem { Key = "WWD", Label = "WWD", Description = "- Обратна команда на WW. Пренасяш обекти от ситуация в напречен профил. Всичко се случва в един файл", AutoCADCommand = "WWD" },
                 new MenuItem { Key = "WWS", Label = "WWS", Description = "- Тази команда в комбинация с WWC е същата като WWD, само че тук работим в два отделни файла. В ситуация с командата WWS взимаме оффсет, след това във файла с напречните профили с командата WWC пренасяме оффсетите", AutoCADCommand = "WWS" }
-,
              // ;;; END DCL SITUACIA ITEMS
             }},
 
@@ -198,7 +197,6 @@ namespace PpsMenu
                 new MenuItem { Key = "askGemini", Label = "askGemini", Description = "- пишеш в ноутпат въпрос към AI Gemini - той ти връща отговор отново в Notepad. Ползва по-стар модел gemini-1.5", AutoCADCommand = "askGemini" },
                 new MenuItem { Key = "iskam", Label = "iskam", Description = "- Добавя предложение/желание за нова команда или функционалност в сайта на програмите", AutoCADCommand = "iskam" },
                 new MenuItem { Key = "CUIPAF", Label = "CUIPAF", Description = "- При ON заменя бутоните F1 - с отваряне на страницата с командите в PPS и F5 - с командата LISPLOAD. При OFF връща старите команди. Добавя и меню с команди", AutoCADCommand = "CUIPAF" }
-,
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -370,5 +368,6 @@ namespace PpsMenu
         public int GetHashCode(KeyValuePair<string, string> obj) => obj.Key.GetHashCode();
     }
 }
+
 
 
