@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- ФУНКЦИЯ ЗА ДОБАВЯНЕ ---
     function addNewCommandToContent(originalContent, newCommand) {
         const { section, key, label } = newCommand;
         const autocadCommand = key;
@@ -107,15 +108,8 @@ document.addEventListener('DOMContentLoaded', () => {
             updateStatus(`Грешка: Не е намерен маркер за край на секция '${marker}'.`, 'error', 'add-status-message');
             return null;
         }
-        
-        let lastItemIndex = endMarkerIndex - 1;
-        while(lastItemIndex > 0 && lines[lastItemIndex].trim() === '') lastItemIndex--;
-        
-        if (lines[lastItemIndex] && lines[lastItemIndex].trim().endsWith('}')) {
-            lines[lastItemIndex] += ',';
-        }
-        
-        const newMenuItem = `                new MenuItem { Key = "${key}", Label = "${key}", Description = "- ${label}", AutoCADCommand = "${autocadCommand}" }`;
+        // Новият ред ВИНАГИ има запетая
+        const newMenuItem = `                new MenuItem { Key = "${key}", Label = "${key}", Description = "- ${label}", AutoCADCommand = "${autocadCommand}" },`;
         lines.splice(endMarkerIndex, 0, newMenuItem);
 
         // --- Логика за CommandMap ---
@@ -124,57 +118,35 @@ document.addEventListener('DOMContentLoaded', () => {
             updateStatus('Грешка: Не е намерен маркер за край на CommandMap.', 'error', 'add-status-message');
             return null;
         }
-        
-        let lastMapIndex = commandMapEndIndex - 1;
-        while(lastMapIndex > 0 && lines[lastMapIndex].trim() === '') lastMapIndex--;
-
-        if (lines[lastMapIndex] && lines[lastMapIndex].trim().endsWith('}')) {
-            lines[lastMapIndex] += ',';
-        }
-        
-        const newMapEntry = `            { "${key}", "${autocadCommand}" }`;
+        // Новият ред ВИНАГИ има запетая
+        const newMapEntry = `            { "${key}", "${autocadCommand}" },`;
         lines.splice(commandMapEndIndex, 0, newMapEntry);
 
         return lines.join('\n');
     }
 
+    // --- ФУНКЦИЯ ЗА ИЗТРИВАНЕ ---
     function removeCommandFromContent(originalContent, commandKey) {
         let lines = originalContent.split('\n');
         let linesChanged = false;
 
-        // --- Логика за MenuItem ---
-        const menuItemLineIndex = lines.findIndex(line => line.includes(`Key = "${commandKey}"`));
+        // Стъпка 1: Намираме и премахваме реда с MenuItem
+        const menuItemLineIndex = lines.findIndex(line =>
+            line.includes('new MenuItem') && line.includes(`Key = "${commandKey}"`)
+        );
 
         if (menuItemLineIndex !== -1) {
-            const lineToRemove = lines[menuItemLineIndex];
             lines.splice(menuItemLineIndex, 1);
-            
-            if (!lineToRemove.trim().endsWith(',')) {
-                 let newLastItemIndex = menuItemLineIndex - 1;
-                 while(newLastItemIndex > 0 && lines[newLastItemIndex].trim() === '') newLastItemIndex--;
-                 
-                 if (lines[newLastItemIndex] && lines[newLastItemIndex].trim().endsWith('},')) {
-                    lines[newLastItemIndex] = lines[newLastItemIndex].trim().slice(0, -1);
-                 }
-            }
             linesChanged = true;
         }
 
-        // --- Логика за CommandMap ---
-        const commandMapLineIndex = lines.findIndex(line => line.trim().startsWith(`{ "${commandKey}"`));
+        // Стъпка 2: Намираме и премахваме реда от CommandMap
+        const commandMapLineIndex = lines.findIndex(line =>
+            line.trim().startsWith(`{ "${commandKey}"`)
+        );
 
         if (commandMapLineIndex !== -1) {
-            const lineToRemove = lines[commandMapLineIndex];
             lines.splice(commandMapLineIndex, 1);
-            
-            if (!lineToRemove.trim().endsWith(',')) {
-                 let newLastMapIndex = commandMapLineIndex - 1;
-                 while(newLastMapIndex > 0 && lines[newLastMapIndex].trim() === '') newLastMapIndex--;
-
-                 if (lines[newLastMapIndex] && lines[newLastMapIndex].trim().endsWith('},')) {
-                    lines[newLastMapIndex] = lines[newLastMapIndex].trim().slice(0, -1);
-                 }
-            }
             linesChanged = true;
         }
 
