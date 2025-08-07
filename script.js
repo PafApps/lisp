@@ -26,10 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
             const response = await fetch(url, {
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Accept': 'application/vnd.github.v3+json'
-                }
+                headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
             });
             if (!response.ok) {
                 const errorData = await response.json();
@@ -62,7 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- ФУНКЦИЯ ЗА ПАРСВАНЕ, БАЗИРАНА НА РАБОТЕЩАТА ЛОГИКА ---
     function parseLispContent(content) {
         const commandMap = {};
         const commandMapSectionMatch = content.match(/;;; START COMMAND MAP([\s\S]*?);;; END COMMAND MAP/);
@@ -83,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayData(data) {
         const commandCount = Object.keys(data.commandMap).length;
         document.getElementById('command-count').textContent = commandCount;
-        if (commandCount === 0) {
+        if (commandCount === 0 && GITHUB_PAT) {
             updateStatus('Предупреждение: Не са намерени команди. Файлът може да е празен или с грешна структура.', 'error');
         }
         const sectionSelect = document.getElementById('command-section');
@@ -96,7 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- ФУНКЦИЯ ЗА ДОБАВЯНЕ ---
     function addNewCommandToContent(originalContent, newCommand) {
         const { section, key, label } = newCommand;
         const autocadCommand = key;
@@ -106,50 +101,81 @@ document.addEventListener('DOMContentLoaded', () => {
             return null;
         }
 
+        let lines = originalContent.split('\n');
         const marker = categoryInfo.markerName;
-        const endMarkerRegex = new RegExp(`(;;; END DCL ${marker} ITEMS)`);
-        let content = originalContent;
         
-        const endMarkerMatch = content.match(endMarkerRegex);
-        if (endMarkerMatch) {
-            const endMarkerIndex = endMarkerMatch.index;
-            const newMenuItem = `                new MenuItem { Key = "${key}", Label = "${key}", Description = "- ${label}", AutoCADCommand = "${autocadCommand}" },\n`;
-            content = content.slice(0, endMarkerIndex) + newMenuItem + content.slice(endMarkerIndex);
+        // 1. Добавяне на MenuItem
+        const endMarkerIndex = lines.findIndex(line => line.includes(`END DCL ${marker} ITEMS`));
+        if (endMarkerIndex !== -1) {
+            const newMenuItem = `                new MenuItem { Key = "${key}", Label = "${key}", Description = "- ${label}", AutoCADCommand = "${autocadCommand}" }`;
+            // Намираме предишния ред и проверяваме дали завършва със запетая
+            let previousLineIndex = endMarkerIndex - 1;
+            while(previousLineIndex > 0 && lines[previousLineIndex].trim() === '') {
+                previousLineIndex--;
+            }
+            if(lines[previousLineIndex].trim().endsWith('}')) {
+                lines[previousLineIndex] = lines[previousLineIndex] + ',';
+            }
+            lines.splice(endMarkerIndex, 0, newMenuItem);
         } else {
             updateStatus(`Грешка: Не е намерен маркер за край на секция '${marker}'.`, 'error', 'add-status-message');
             return null;
         }
 
-        const commandMapEndMarker = /(}\s*;\s*\/\/\s*;;;\s*END COMMAND MAP)/;
-        const commandMapEndMatch = content.match(commandMapEndMarker);
-        if(commandMapEndMatch) {
-             const endMapIndex = commandMapEndMatch.index;
-             const newMapEntry = `            { "${key}", "${autocadCommand}" },\n`;
-             content = content.slice(0, endMapIndex) + newMapEntry + content.slice(endMapIndex);
+        // 2. Добавяне в CommandMap
+        const commandMapEndIndex = lines.findIndex(line => line.includes('END COMMAND MAP'));
+        if(commandMapEndIndex !== -1) {
+             const newMapEntry = `            { "${key}", "${autocadCommand}" },`;
+             lines.splice(commandMapEndIndex, 0, newMapEntry);
         } else {
             updateStatus('Грешка: Не е намерен маркер за край на CommandMap.', 'error', 'add-status-message');
             return null;
         }
 
-        return content;
+        return lines.join('\n');
     }
 
-    // --- ФУНКЦИЯ ЗА ИЗТРИВАНЕ ---
+    // --- БЕЗОПАСНА ФУНКЦИЯ ЗА ИЗТРИВАНЕ ---
     function removeCommandFromContent(originalContent, commandKey) {
-        const originalLength = originalContent.length;
-        let content = originalContent;
+        let lines = originalContent.split('\n');
+        let linesChanged = false;
 
-        const menuItemRegex = new RegExp(`\\s*new MenuItem\\s*{[\\s\\S]*?Key\\s*=\\s*"${commandKey}"[\\s\\S]*?},?\\n?`);
-        content = content.replace(menuItemRegex, '');
-        
-        const commandMapRegex = new RegExp(`\\s*{\\s*"${commandKey}"\\s*,\\s*"[^"]*"\\s*},?\\n?`);
-        content = content.replace(commandMapRegex, '');
+        // Стъпка 1: Намираме и премахваме реда с MenuItem
+        const menuItemLineIndex = lines.findIndex(line =>
+            line.includes('new MenuItem') && line.includes(`Key = "${commandKey}"`)
+        );
 
-        if (content.length >= originalLength) {
-            return null; 
+        if (menuItemLineIndex !== -1) {
+            // Проверяваме дали предният ред трябва да остане без запетая
+            const lineToRemove = lines[menuItemLineIndex];
+            if (lineToRemove.trim().endsWith('},')) {
+                 let previousLineIndex = menuItemLineIndex - 1;
+                 while(previousLineIndex > 0 && lines[previousLineIndex].trim() === '') {
+                     previousLineIndex--;
+                 }
+                 if (lines[previousLineIndex] && lines[previousLineIndex].trim().endsWith('},')) {
+                    lines[previousLineIndex] = lines[previousLineIndex].slice(0, -1);
+                 }
+            }
+            lines.splice(menuItemLineIndex, 1);
+            linesChanged = true;
         }
 
-        return content;
+        // Стъпка 2: Намираме и премахваме реда от CommandMap
+        const commandMapLineIndex = lines.findIndex(line =>
+            line.trim().startsWith(`{ "${commandKey}"`)
+        );
+
+        if (commandMapLineIndex !== -1) {
+            lines.splice(commandMapLineIndex, 1);
+            linesChanged = true;
+        }
+
+        if (!linesChanged) {
+            return null;
+        }
+
+        return lines.join('\n');
     }
 
     function updateStatus(message, type, elementId = 'status-message') {
@@ -168,10 +194,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('delete-status-message').style.display = 'none';
     }
 
-    // --- Събития ---
     loadBtn.addEventListener('click', async () => {
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
-        if (!GITHUB_PAT) { updateStatus('Моля, въведете Personal Access Token (PAT).', 'error'); return; }
+        if (!GITHUB_PAT) {
+            updateStatus('Моля, въведете Personal Access Token (PAT).', 'error');
+            return;
+        }
         
         updateStatus('Зареждане...', 'success');
         appContent.classList.add('hidden');
