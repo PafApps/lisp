@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мениджър на AutoLISP Команди</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Мениджър на AutoLISP Команди</h1>
+        <p>Въведете вашия Personal Access Token (PAT), за да заредите и управлявате командите.</p>
+
+        <div id="config-section">
+            <input type="password" id="githubPat" placeholder="Personal Access Token (PAT)">
+            <button id="load-commands-btn">Зареди Командите</button>
+        </div>
+
+        <hr>
+
+        <div id="app-content" class="hidden">
+            <div id="command-summary">
+                <h2>Обобщение на командите</h2>
+                <p>Общо извлечени команди: <span id="command-count">0</span></p>
+            </div>
+
+            <div class="form-container">
+                <h2>Добави нова команда</h2>
+                <form id="add-command-form">
+                    <select id="command-section" required>
+                        <option value="" disabled selected>Избери секция...</option>
+                    </select>
+                    <input type="text" id="command-key" placeholder="Ключ на командата (напр. dd)" required>
+                    <textarea id="command-label" placeholder="Описание на командата" required></textarea>
+                    <button type="submit">Добави и Запази в GitHub</button>
+                    <!-- Ново: Контейнер за съобщения за тази форма -->
+                    <div id="add-status-message" class="form-status-message"></div>
+                </form>
+            </div>
+
+            <hr>
+            <div class="form-container">
+                <h2>Изтрий съществуваща команда</h2>
+                <form id="delete-command-form">
+                    <p>Въведете точния ключ на командата, която искате да премахнете. Операцията е необратима.</p>
+                    <input type="text" id="delete-command-key" placeholder="Ключ на командата за изтриване (напр. dd)" required>
+                    <button type="submit" class="delete-btn">Изтрий Командата от GitHub</button>
+                    <!-- Ново: Контейнер за съобщения за тази форма -->
+                    <div id="delete-status-message" class="form-status-message"></div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Този контейнер остава за глобални съобщения (напр. грешка с PAT) -->
+        <div id="status-message" style="display: none;"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
