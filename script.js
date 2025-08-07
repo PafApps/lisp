@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const addCommandForm = document.getElementById('add-command-form');
     const deleteCommandForm = document.getElementById('delete-command-form');
 
-    // ========== КОНФИГУРАЦИЯ ==========
     const GITHUB_USER = "PafApps";
     const GITHUB_REPO = "lisp";
     const FILE_PATH = "HELP_LISP.lsp";
@@ -19,7 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
         "РЕГИСТРИ": { markerName: "REGISTRI" },
         "ДРУГИ": { markerName: "DRUGI" },
     };
-    // ===================================
 
     let GITHUB_PAT = '';
     let lispData = { commandMap: {}, sha: '' };
@@ -27,13 +25,20 @@ document.addEventListener('DOMContentLoaded', () => {
     async function getFileContent(user, repo, path, token) {
         try {
             const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
-            const response = await fetch(url, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } });
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(`Грешка при зареждане: ${response.statusText} - ${errorData.message}`);
             }
             const data = await response.json();
-            return { content: decodeURIComponent(escape(atob(data.content))), sha: data.sha };
+            // Правилно декодиране от Base64 към UTF-8
+            const decodedContent = decodeURIComponent(atob(data.content).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+            return { content: decodedContent, sha: data.sha };
         } catch (error) {
             updateStatus(`Мрежова грешка: ${error.message}. Проверете PAT и интернет връзката си.`, 'error');
             return null;
@@ -43,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function updateFileContent(user, repo, path, token, newContent, sha, commitMessage) {
         try {
             const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
+            // Правилно енкодиране от UTF-8 към Base64
             const encodedContent = btoa(unescape(encodeURIComponent(newContent)));
             const response = await fetch(url, {
                 method: 'PUT',
@@ -58,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- НОВА ФУНКЦИЯ ЗА ПАРСВАНЕ ---
+    // --- ФУНКЦИЯ ЗА ПАРСВАНЕ, КОЯТО РАБОТИ С НОВИЯ ФОРМАТ ---
     function parseLispContent(content) {
         const commandMapSectionMatch = content.match(/public static readonly Dictionary<string, string> CommandMap[\s\S]*?{([\s\S]*?)};/);
         const commandMap = {};
@@ -68,8 +74,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const mapEntryRegex = /{\s*"([^"]+)"\s*,\s*"[^"]*"\s*}/g;
             let entryMatch;
             while ((entryMatch = mapEntryRegex.exec(mapContent)) !== null) {
-                commandMap[entryMatch[1]] = true; // Стойността не е важна, само наличието на ключа
+                commandMap[entryMatch[1]] = true;
             }
+        } else {
+             updateStatus('Грешка: Не може да бъде намерен "CommandMap" в съдържанието на файла.', 'error');
         }
         return { commandMap };
     }
@@ -86,9 +94,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- ОБНОВЕНА ФУНКЦИЯ ЗА ДОБАВЯНЕ ---
+    // --- ФУНКЦИЯ ЗА ДОБАВЯНЕ, КОЯТО РАБОТИ С НОВИЯ ФОРМАТ ---
     function addNewCommandToContent(originalContent, newCommand) {
-        const { section, key, label, autocadCommand } = newCommand;
+        const { section, key, label } = newCommand;
+        const autocadCommand = key; // Командата е същата като ключа
         const categoryInfo = categoryConfig[section];
         if (!categoryInfo) {
             updateStatus('Избраната секция не е валидна.', 'error', 'add-status-message');
@@ -99,7 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const endMarkerRegex = new RegExp(`(;;; END DCL ${marker} ITEMS)`);
         let content = originalContent;
         
-        // 1. Добавяне в списъка с MenuItem
         const endMarkerMatch = content.match(endMarkerRegex);
         if (endMarkerMatch) {
             const endMarkerIndex = endMarkerMatch.index;
@@ -110,7 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return null;
         }
 
-        // 2. Добавяне в CommandMap
         const commandMapEndMarker = /(}\s*;\s*\/\/\s*;;;\s*END COMMAND MAP)/;
         const commandMapEndMatch = content.match(commandMapEndMarker);
         if(commandMapEndMatch) {
@@ -125,16 +132,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return content;
     }
 
-    // --- ОБНОВЕНА ФУНКЦИЯ ЗА ИЗТРИВАНЕ ---
+    // --- ФУНКЦИЯ ЗА ИЗТРИВАНЕ, КОЯТО РАБОТИ С НОВИЯ ФОРМАТ ---
     function removeCommandFromContent(originalContent, commandKey) {
         const originalLength = originalContent.length;
         let content = originalContent;
 
-        // 1. Премахване от MenuItem списъците
         const menuItemRegex = new RegExp(`\\s*new MenuItem\\s*{[\\s\\S]*?Key\\s*=\\s*"${commandKey}"[\\s\\S]*?},?\\n?`);
         content = content.replace(menuItemRegex, '');
         
-        // 2. Премахване от CommandMap
         const commandMapRegex = new RegExp(`\\s*{\\s*"${commandKey}"\\s*,\\s*"[^"]*"\\s*},?\\n?`);
         content = content.replace(commandMapRegex, '');
 
@@ -186,10 +191,9 @@ document.addEventListener('DOMContentLoaded', () => {
             section: document.getElementById('command-section').value,
             key: document.getElementById('command-key').value.trim(),
             label: document.getElementById('command-label').value.trim(),
-            autocadCommand: document.getElementById('autocad-command').value.trim(),
         };
 
-        if (!newCommand.section || !newCommand.key || !newCommand.label || !newCommand.autocadCommand) {
+        if (!newCommand.section || !newCommand.key || !newCommand.label) {
             updateStatus('Моля, попълнете всички полета.', 'error', statusId);
             return;
         }
@@ -204,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const newContent = addNewCommandToContent(fileData.content, newCommand);
         if (newContent === null) {
-             return; // Грешката вече е показана от самата функция
+             return; 
         }
 
         const commitMessage = `[Admin] Добавена е нова команда: ${newCommand.key}`;
@@ -212,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (result) {
             updateStatus(`Команда '${newCommand.key}' е добавена успешно!`, 'success', statusId);
             addCommandForm.reset();
-            loadBtn.click(); // Презареждане на данните
+            loadBtn.click();
         }
     });
 
@@ -247,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (result) {
             updateStatus(`Команда '${keyToDelete}' е изтрита успешно!`, 'success', statusId);
             document.getElementById('delete-command-key').value = '';
-            loadBtn.click(); // Презареждане на данните
+            loadBtn.click();
         }
     });
 });
