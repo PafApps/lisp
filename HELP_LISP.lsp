@@ -74,7 +74,8 @@ namespace PpsMenu
                 new MenuItem { Key = "WWD", Label = "WWD", Description = "- Обратна команда на WW. Пренасяш обекти от ситуация в напречен профил. Всичко се случва в един файл", AutoCADCommand = "WWD" },
                 new MenuItem { Key = "WWS", Label = "WWS", Description = "- Тази команда в комбинация с WWC е същата като WWD, само че тук работим в два отделни файла. В ситуация с командата WWS взимаме оффсет, след това във файла с напречните профили с командата WWC пренасяме оффсетите", AutoCADCommand = "WWS" }
             }},
-            // ;;; END DCL SITUACIA ITEMS
+            //                 new MenuItem { Key = "ТЕСТ", Label = "ТЕСТ", Description = "- Тествам команда добавяне", AutoCADCommand = "ТЕСТ" },
+;;; END DCL SITUACIA ITEMS
 
             // ;;; START DCL NADLZHNI ITEMS
             { "НАДЛЪЖНИ", new List<MenuItem> {
@@ -349,7 +350,8 @@ namespace PpsMenu
             { "LNi", "LNi" },
             { "WWD", "WWD" },
             { "WWS", "WWS" }
-        };
+                    { "ТЕСТ", "ТЕСТ" },
+};
         // ;;; END COMMAND MAP
     }
 
