@@ -197,7 +197,8 @@ namespace PpsMenu
                 new MenuItem { Key = "rtl", Label = "RTL", Description = "- върти TEXT и MTEXT спрямо линия или полилиния", AutoCADCommand = "RTL" },
                 new MenuItem { Key = "askGemini", Label = "askGemini", Description = "- пишеш в ноутпат въпрос към AI Gemini - той ти връща отговор отново в Notepad. Ползва по-стар модел gemini-1.5", AutoCADCommand = "askGemini" },
                 new MenuItem { Key = "iskam", Label = "iskam", Description = "- Добавя предложение/желание за нова команда или функционалност в сайта на програмите", AutoCADCommand = "iskam" },
-                new MenuItem { Key = "CUIPAF", Label = "CUIPAF", Description = "- При ON заменя бутоните F1 - с отваряне на страницата с командите в PPS и F5 - с командата LISPLOAD. При OFF връща старите команди. Добавя и меню с команди", AutoCADCommand = "CUIPAF" },
+                new MenuItem { Key = "CUIPAF", Label = "CUIPAF", Description = "- При ON заменя бутоните F1 - с отваряне на страницата с командите в PPS и F5 - с командата LISPLOAD. При OFF връща старите команди. Добавя и меню с команди", AutoCADCommand = "CUIPAF" }
+,
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -357,7 +358,7 @@ namespace PpsMenu
             { "CUIPAF", "CUIPAF" },
             { "LNi", "LNi" },
             { "WWD", "WWD" },
-            { "WWS", "WWS" },
+            { "WWS", "WWS" },
         // ;;; END COMMAND MAP
         };
     }
@@ -369,4 +370,5 @@ namespace PpsMenu
         public int GetHashCode(KeyValuePair<string, string> obj) => obj.Key.GetHashCode();
     }
 }
+
 
