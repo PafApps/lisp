@@ -36,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(`Грешка при зареждане: ${response.statusText} - ${errorData.message}`);
             }
             const data = await response.json();
-            // Правилно декодиране от Base64 към UTF-8
             const decodedContent = decodeURIComponent(atob(data.content).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
             return { content: decodedContent, sha: data.sha };
         } catch (error) {
@@ -48,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
     async function updateFileContent(user, repo, path, token, newContent, sha, commitMessage) {
         try {
             const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
-            // Правилно енкодиране от UTF-8 към Base64
             const encodedContent = btoa(unescape(encodeURIComponent(newContent)));
             const response = await fetch(url, {
                 method: 'PUT',
@@ -64,10 +62,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- ФУНКЦИЯ ЗА ПАРСВАНЕ, КОЯТО РАБОТИ С НОВИЯ ФОРМАТ ---
+    // --- ФУНКЦИЯ ЗА ПАРСВАНЕ, БАЗИРАНА НА РАБОТЕЩАТА ЛОГИКА ---
     function parseLispContent(content) {
-        const commandMapSectionMatch = content.match(/public static readonly Dictionary<string, string> CommandMap[\s\S]*?{([\s\S]*?)};/);
         const commandMap = {};
+        const commandMapSectionMatch = content.match(/;;; START COMMAND MAP([\s\S]*?);;; END COMMAND MAP/);
         
         if (commandMapSectionMatch && commandMapSectionMatch[1]) {
             const mapContent = commandMapSectionMatch[1];
@@ -77,13 +75,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 commandMap[entryMatch[1]] = true;
             }
         } else {
-             updateStatus('Грешка: Не може да бъде намерен "CommandMap" в съдържанието на файла.', 'error');
+             updateStatus('Грешка: Не може да бъде намерен "COMMAND MAP" маркер в съдържанието на файла.', 'error');
         }
         return { commandMap };
     }
     
     function displayData(data) {
-        document.getElementById('command-count').textContent = Object.keys(data.commandMap).length;
+        const commandCount = Object.keys(data.commandMap).length;
+        document.getElementById('command-count').textContent = commandCount;
+        if (commandCount === 0) {
+            updateStatus('Предупреждение: Не са намерени команди. Файлът може да е празен или с грешна структура.', 'error');
+        }
         const sectionSelect = document.getElementById('command-section');
         sectionSelect.innerHTML = '<option value="" disabled selected>Избери секция...</option>';
         Object.keys(categoryConfig).forEach(cyrillicName => {
@@ -94,10 +96,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- ФУНКЦИЯ ЗА ДОБАВЯНЕ, КОЯТО РАБОТИ С НОВИЯ ФОРМАТ ---
+    // --- ФУНКЦИЯ ЗА ДОБАВЯНЕ ---
     function addNewCommandToContent(originalContent, newCommand) {
         const { section, key, label } = newCommand;
-        const autocadCommand = key; // Командата е същата като ключа
+        const autocadCommand = key;
         const categoryInfo = categoryConfig[section];
         if (!categoryInfo) {
             updateStatus('Избраната секция не е валидна.', 'error', 'add-status-message');
@@ -132,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return content;
     }
 
-    // --- ФУНКЦИЯ ЗА ИЗТРИВАНЕ, КОЯТО РАБОТИ С НОВИЯ ФОРМАТ ---
+    // --- ФУНКЦИЯ ЗА ИЗТРИВАНЕ ---
     function removeCommandFromContent(originalContent, commandKey) {
         const originalLength = originalContent.length;
         let content = originalContent;
@@ -207,9 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!fileData) return;
         
         const newContent = addNewCommandToContent(fileData.content, newCommand);
-        if (newContent === null) {
-             return; 
-        }
+        if (newContent === null) return; 
 
         const commitMessage = `[Admin] Добавена е нова команда: ${newCommand.key}`;
         const result = await updateFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT, newContent, fileData.sha, commitMessage);
