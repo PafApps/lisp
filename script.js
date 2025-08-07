@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const GITHUB_REPO = "lisp";
     const FILE_PATH = "HELP_LISP.lsp";
 
-    // Тази конфигурация трябва да е синхронизирана с тази от основния сайт
     const categoryConfig = {
         "СИТУАЦИЯ": { markerName: "SITUACIA" },
         "НАДЛЪЖНИ": { markerName: "NADLZHNI" },
@@ -23,16 +22,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===================================
 
     let GITHUB_PAT = '';
-    let lispData = { commandMap: {}, uniqueCommandKeys: [] };
+    let lispData = { commandMap: {}, sha: '' };
 
     async function getFileContent(user, repo, path, token) {
         try {
             const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
-            const response = await fetch(url, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3.raw' } });
-            if (!response.ok) throw new Error(`Грешка при зареждане: ${response.statusText}`);
-            const content = await response.text();
-            const sha = response.headers.get('ETag').replace(/"/g, ''); // Взимаме SHA от хедърите
-            return { content, sha };
+            const response = await fetch(url, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Грешка при зареждане: ${response.statusText} - ${errorData.message}`);
+            }
+            const data = await response.json();
+            return { content: decodeURIComponent(escape(atob(data.content))), sha: data.sha };
         } catch (error) {
             updateStatus(`Мрежова грешка: ${error.message}. Проверете PAT и интернет връзката си.`, 'error');
             return null;
@@ -58,26 +59,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- НОВА ФУНКЦИЯ ЗА ПАРСВАНЕ ---
-    function parseNewLispContent(content) {
+    function parseLispContent(content) {
         const commandMapSectionMatch = content.match(/public static readonly Dictionary<string, string> CommandMap[\s\S]*?{([\s\S]*?)};/);
         const commandMap = {};
-        const uniqueCommandKeys = new Set();
-
+        
         if (commandMapSectionMatch && commandMapSectionMatch[1]) {
             const mapContent = commandMapSectionMatch[1];
             const mapEntryRegex = /{\s*"([^"]+)"\s*,\s*"[^"]*"\s*}/g;
             let entryMatch;
             while ((entryMatch = mapEntryRegex.exec(mapContent)) !== null) {
-                const key = entryMatch[1];
-                commandMap[key] = key;
-                uniqueCommandKeys.add(key);
+                commandMap[entryMatch[1]] = true; // Стойността не е важна, само наличието на ключа
             }
         }
-        return { commandMap, uniqueCommandKeys: Array.from(uniqueCommandKeys) };
+        return { commandMap };
     }
     
-    function displayData({ uniqueCommandKeys }) {
-        document.getElementById('command-count').textContent = uniqueCommandKeys.length;
+    function displayData(data) {
+        document.getElementById('command-count').textContent = Object.keys(data.commandMap).length;
         const sectionSelect = document.getElementById('command-section');
         sectionSelect.innerHTML = '<option value="" disabled selected>Избери секция...</option>';
         Object.keys(categoryConfig).forEach(cyrillicName => {
@@ -92,14 +90,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function addNewCommandToContent(originalContent, newCommand) {
         const { section, key, label, autocadCommand } = newCommand;
         const categoryInfo = categoryConfig[section];
-        if (!categoryInfo) return null;
+        if (!categoryInfo) {
+            updateStatus('Избраната секция не е валидна.', 'error', 'add-status-message');
+            return null;
+        }
 
         const marker = categoryInfo.markerName;
         const endMarkerRegex = new RegExp(`(;;; END DCL ${marker} ITEMS)`);
-        
         let content = originalContent;
         
-        // 1. Добавяне в списъка с команди за съответната категория
+        // 1. Добавяне в списъка с MenuItem
         const endMarkerMatch = content.match(endMarkerRegex);
         if (endMarkerMatch) {
             const endMarkerIndex = endMarkerMatch.index;
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // 2. Добавяне в CommandMap
-        const commandMapEndMarker = /}\s*;\s*\/\/\s*;;;\s*END COMMAND MAP/;
+        const commandMapEndMarker = /(}\s*;\s*\/\/\s*;;;\s*END COMMAND MAP)/;
         const commandMapEndMatch = content.match(commandMapEndMarker);
         if(commandMapEndMatch) {
              const endMapIndex = commandMapEndMatch.index;
@@ -130,8 +130,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const originalLength = originalContent.length;
         let content = originalContent;
 
-        // 1. Премахване от списъка с команди (MenuItem)
-        const menuItemRegex = new RegExp(`\\s*new MenuItem\\s*{\\s*Key\\s*=\\s*"${commandKey}"[\\s\\S]*?},?\\n?`);
+        // 1. Премахване от MenuItem списъците
+        const menuItemRegex = new RegExp(`\\s*new MenuItem\\s*{[\\s\\S]*?Key\\s*=\\s*"${commandKey}"[\\s\\S]*?},?\\n?`);
         content = content.replace(menuItemRegex, '');
         
         // 2. Премахване от CommandMap
@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         content = content.replace(commandMapRegex, '');
 
         if (content.length >= originalLength) {
-            return null; // Връщаме null, ако ключът не е намерен никъде
+            return null; 
         }
 
         return content;
@@ -151,27 +151,36 @@ document.addEventListener('DOMContentLoaded', () => {
         statusDiv.className = `form-status-message status-${type}`;
         statusDiv.textContent = message;
         statusDiv.style.display = 'block';
-        setTimeout(() => { statusDiv.style.display = 'none'; }, 5000);
+        if (elementId === 'status-message') {
+            setTimeout(() => { statusDiv.style.display = 'none'; }, 5000);
+        }
     }
     
+    function clearFormStatus() {
+        document.getElementById('add-status-message').style.display = 'none';
+        document.getElementById('delete-status-message').style.display = 'none';
+    }
+
     // --- Събития ---
     loadBtn.addEventListener('click', async () => {
         GITHUB_PAT = document.getElementById('githubPat').value.trim();
         if (!GITHUB_PAT) { updateStatus('Моля, въведете Personal Access Token (PAT).', 'error'); return; }
-        appContent.classList.remove('hidden');
-        const summary = document.getElementById('command-summary');
-        summary.innerHTML = '<p class="loading">Зареждане...</p>';
+        
+        updateStatus('Зареждане...', 'success');
+        appContent.classList.add('hidden');
         
         const fileData = await getFileContent(GITHUB_USER, GITHUB_REPO, FILE_PATH, GITHUB_PAT);
         if (fileData) {
-            summary.innerHTML = `<h2>Обобщение на командите</h2><p>Общо уникални команди: <span id="command-count">0</span></p>`;
-            lispData = parseNewLispContent(fileData.content);
+            updateStatus('Файлът е зареден успешно.', 'success');
+            lispData = { ...parseLispContent(fileData.content), sha: fileData.sha };
             displayData(lispData);
+            appContent.classList.remove('hidden');
         }
     });
 
     addCommandForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        clearFormStatus();
         const statusId = 'add-status-message';
         const newCommand = {
             section: document.getElementById('command-section').value,
@@ -195,8 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const newContent = addNewCommandToContent(fileData.content, newCommand);
         if (newContent === null) {
-             updateStatus('Възникна вътрешна грешка при генериране на файла.', 'error', statusId);
-             return;
+             return; // Грешката вече е показана от самата функция
         }
 
         const commitMessage = `[Admin] Добавена е нова команда: ${newCommand.key}`;
@@ -204,12 +212,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (result) {
             updateStatus(`Команда '${newCommand.key}' е добавена успешно!`, 'success', statusId);
             addCommandForm.reset();
-            loadBtn.click();
+            loadBtn.click(); // Презареждане на данните
         }
     });
 
     deleteCommandForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        clearFormStatus();
         const statusId = 'delete-status-message';
         const keyToDelete = document.getElementById('delete-command-key').value.trim();
 
@@ -238,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (result) {
             updateStatus(`Команда '${keyToDelete}' е изтрита успешно!`, 'success', statusId);
             document.getElementById('delete-command-key').value = '';
-            loadBtn.click();
+            loadBtn.click(); // Презареждане на данните
         }
     });
 });
