@@ -198,7 +198,6 @@ namespace PpsMenu
                 new MenuItem { Key = "askGemini", Label = "askGemini", Description = "- пишеш в ноутпат въпрос към AI Gemini - той ти връща отговор отново в Notepad. Ползва по-стар модел gemini-1.5", AutoCADCommand = "askGemini" },
                 new MenuItem { Key = "iskam", Label = "iskam", Description = "- Добавя предложение/желание за нова команда или функционалност в сайта на програмите", AutoCADCommand = "iskam" },
                 new MenuItem { Key = "CUIPAF", Label = "CUIPAF", Description = "- При ON заменя бутоните F1 - с отваряне на страницата с командите в PPS и F5 - с командата LISPLOAD. При OFF връща старите команди. Добавя и меню с команди", AutoCADCommand = "CUIPAF" },
-                new MenuItem { Key = "TEST", Label = "TEST", Description = "- Тестване на нбова асадсад асда", AutoCADCommand = "TEST" }
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -359,7 +358,6 @@ namespace PpsMenu
             { "LNi", "LNi" },
             { "WWD", "WWD" },
             { "WWS", "WWS" },
-            { "TEST", "TEST" }
         // ;;; END COMMAND MAP
         };
     }
