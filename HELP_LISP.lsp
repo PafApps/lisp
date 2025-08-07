@@ -73,8 +73,6 @@ namespace PpsMenu
                 new MenuItem { Key = "MTB", Label = "MTB", Description = "- същото като MTA, но за блокове.", AutoCADCommand = "MTB" },
                 new MenuItem { Key = "WWD", Label = "WWD", Description = "- Обратна команда на WW. Пренасяш обекти от ситуация в напречен профил. Всичко се случва в един файл", AutoCADCommand = "WWD" },
                 new MenuItem { Key = "WWS", Label = "WWS", Description = "- Тази команда в комбинация с WWC е същата като WWD, само че тук работим в два отделни файла. В ситуация с командата WWS взимаме оффсет, след това във файла с напречните профили с командата WWC пренасяме оффсетите", AutoCADCommand = "WWS" },
-                new MenuItem { Key = "TEST", Label = "TEST", Description = "- Тестжадс фдф сдф сдфс дфсдфсд фсдфсд фсдфсдфсд фсдфс дфсд фс", AutoCADCommand = "TEST" },
-                new MenuItem { Key = "ТТТТТ", Label = "ТТТТТ", Description = "- ТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТТ", AutoCADCommand = "ТТТТТ" },
              // ;;; END DCL SITUACIA ITEMS
             }},
 
@@ -95,7 +93,7 @@ namespace PpsMenu
                 new MenuItem { Key = "wf", Label = "wf", Description = "- Променя width factor на избран/и текстови обекти", AutoCADCommand = "wf" },
                 new MenuItem { Key = "wfb", Label = "wfb", Description = "- Променя width factor на текст, който се намира в блок", AutoCADCommand = "wfb" },
                 new MenuItem { Key = "DIt", Label = "DIt", Description = "- Измерва разстоянието между две точки и го записва в избран TEXT или MTEXT", AutoCADCommand = "DIt" },
-                new MenuItem { Key = "LNi", Label = "LNi", Description = "- Избираш вертикален мащаб (1:1 , 1:10, 1:100) и мерни единици (проценти или промили) и чертаеш линия на която можеш да сменяш наклона преди да си маркирал втората точка. С + и - или със Space и число показваш какъв наклон да е линията", AutoCADCommand = "LNi" }
+                new MenuItem { Key = "LNi", Label = "LNi", Description = "- Избираш вертикален мащаб (1:1 , 1:10, 1:100) и мерни единици (проценти или промили) и чертаеш линия на която можеш да сменяш наклона преди да си маркирал втората точка. С + и - или със Space и число показваш какъв наклон да е линията", AutoCADCommand = "LNi" },
             // ;;; END DCL NADLZHNI ITEMS 
             }},
 
@@ -135,7 +133,7 @@ namespace PpsMenu
                 new MenuItem { Key = "QALL", Label = "QH", Description = "- ограждане на всички количества 1 по 1, като изолира нужните слоеве и се огражда като с хетч (ако контура не е затворен или има блокове понякога дава грешки)", AutoCADCommand = "QH" },
                 new MenuItem { Key = "QB", Label = "QB", Description = "- ограждане на всички количества 1 по 1, като изолира нужните слоеве, маркират се обектите между които да се пусне граница и се огражда с Boundery. По-надеждно е от QH", AutoCADCommand = "QB" },
                 new MenuItem { Key = "d3t", Label = "d3t", Description = "- изкарва теренните коти в напречен профил през 1 метър.", AutoCADCommand = "d3t" },
-                new MenuItem { Key = "BK", Label = "BK", Description = "- Добавя базовите коти в атрибута на скарата на напречния профил", AutoCADCommand = "BK" }
+                new MenuItem { Key = "BK", Label = "BK", Description = "- Добавя базовите коти в атрибута на скарата на напречния профил", AutoCADCommand = "BK" },
             // ;;; END DCL NAPRECHNI ITEMS
             }},
 
@@ -150,7 +148,7 @@ namespace PpsMenu
                 new MenuItem { Key = "ncut", Label = "ncut", Description = "- CUT-va обект от блок без да се налага да се влиза в него", AutoCADCommand = "ncut" },
                 new MenuItem { Key = "nmove", Label = "nmove", Description = "- Премества обекти в блокове и XREF без да се налага да влизате в тях. (Внимавайте защото прави save На xref дори да е отворен!)", AutoCADCommand = "nmove" },
                 new MenuItem { Key = "delblocks", Label = "delblocks", Description = "- Изтрива избран блок или блокове от файла", AutoCADCommand = "delblocks" },
-                new MenuItem { Key = "wfb", Label = "wfb", Description = "- Променя width factor на текст, който се намира в блок", AutoCADCommand = "wfb" }
+                new MenuItem { Key = "wfb", Label = "wfb", Description = "- Променя width factor на текст, който се намира в блок", AutoCADCommand = "wfb" },
             // ;;; END DCL BLOKOVE ITEMS
             }},
 
@@ -173,7 +171,7 @@ namespace PpsMenu
                 new MenuItem { Key = "copyVp", Label = "copyVp", Description = "- копира горните лейаути на надлъжния профил при долните /когато са направени чрез MAPWSPACE/", AutoCADCommand = "copyVp" },
                 new MenuItem { Key = "c2l", Label = "c2l", Description = "- копира избран от вас обект/обекти в избрани от вас лейаути във файла", AutoCADCommand = "c2l" },
                 new MenuItem { Key = "c2al", Label = "c2al", Description = "- копира избран от вас обект/обекти във всички лейаути във файла", AutoCADCommand = "c2al" },
-                new MenuItem { Key = "selectRWC", Label = "selectRWC", Description = "- маркира последователно по Y рамките на напречните профили, за да може да се направят Layout-и с MAPWSPACE", AutoCADCommand = "selectRWC" }
+                new MenuItem { Key = "selectRWC", Label = "selectRWC", Description = "- маркира последователно по Y рамките на напречните профили, за да може да се направят Layout-и с MAPWSPACE", AutoCADCommand = "selectRWC" },
             // ;;; END DCL LAYOUTI ITEMS
             }},
 
@@ -198,7 +196,7 @@ namespace PpsMenu
                 new MenuItem { Key = "rtl", Label = "RTL", Description = "- върти TEXT и MTEXT спрямо линия или полилиния", AutoCADCommand = "RTL" },
                 new MenuItem { Key = "askGemini", Label = "askGemini", Description = "- пишеш в ноутпат въпрос към AI Gemini - той ти връща отговор отново в Notepad. Ползва по-стар модел gemini-1.5", AutoCADCommand = "askGemini" },
                 new MenuItem { Key = "iskam", Label = "iskam", Description = "- Добавя предложение/желание за нова команда или функционалност в сайта на програмите", AutoCADCommand = "iskam" },
-                new MenuItem { Key = "CUIPAF", Label = "CUIPAF", Description = "- При ON заменя бутоните F1 - с отваряне на страницата с командите в PPS и F5 - с командата LISPLOAD. При OFF връща старите команди. Добавя и меню с команди", AutoCADCommand = "CUIPAF" }
+                new MenuItem { Key = "CUIPAF", Label = "CUIPAF", Description = "- При ON заменя бутоните F1 - с отваряне на страницата с командите в PPS и F5 - с командата LISPLOAD. При OFF връща старите команди. Добавя и меню с команди", AutoCADCommand = "CUIPAF" },
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -222,7 +220,7 @@ namespace PpsMenu
                 new MenuItem { Key = "cPExp", Label = "cPExp", Description = "- Изкарва регистър на реперите от сивилски точки. Маркира се алаймънт и всички сивилски точки", AutoCADCommand = "cPExp" },
                 new MenuItem { Key = "Bazovi", Label = "Bazovi", Description = "- В сивил сменя базовите коти на много профили наведнъж, като му задаваш разстоянието от кота глава релса до базовата кота", AutoCADCommand = "Bazovi" },
                 new MenuItem { Key = "RamkaLR", Label = "RamkaLR", Description = "- Мести напречните профили в ляво и дясно, като го правиш за повече профили едновременно и с по-голяма стойност", AutoCADCommand = "RamkaLR" },
-                new MenuItem { Key = "RWCedit", Label = "RWCedit", Description = "- В сивил манипулираш (местиш) нагоре надолу с по 1м един или няколко профила наведнъж", AutoCADCommand = "RWCedit" }
+                new MenuItem { Key = "RWCedit", Label = "RWCedit", Description = "- В сивил манипулираш (местиш) нагоре надолу с по 1м един или няколко профила наведнъж", AutoCADCommand = "RWCedit" },
             // ;;; END DCL CIVIL ITEMS
             }},
 
@@ -239,7 +237,7 @@ namespace PpsMenu
                 new MenuItem { Key = "regHro", Label = "regHro", Description = "- Изкарва регистър в ПЛАН на ПЪТ във файл в същата папка.", AutoCADCommand = "regHro" },
                 new MenuItem { Key = "regVro", Label = "regVro", Description = "- Изкарва регистър в ПРОФИЛ на ПЪТ във файл в същата папка.", AutoCADCommand = "regVro" },
                 new MenuItem { Key = "regCro", Label = "regCro", Description = "- Изкарва КООРДИНАТЕН регистър на ПЪТ във файл в същата папка.", AutoCADCommand = "regCro" },
-                new MenuItem { Key = "cPExp", Label = "cPExp", Description = "- Изкарва регистър на реперите от сивилски точки. Маркира се алаймънт и всички сивилски точки", AutoCADCommand = "cPExp" }
+                new MenuItem { Key = "cPExp", Label = "cPExp", Description = "- Изкарва регистър на реперите от сивилски точки. Маркира се алаймънт и всички сивилски точки", AutoCADCommand = "cPExp" },
             // ;;; END DCL REGISTRI ITEMS
             }}
 
@@ -358,10 +356,7 @@ namespace PpsMenu
             { "CUIPAF", "CUIPAF" },
             { "LNi", "LNi" },
             { "WWD", "WWD" },
-{ "WWS", "WWS" }
-,
-            { "TEST", "TEST" },
-            { "ТТТТТ", "ТТТТТ" }
+            { "WWS", "WWS" },
         // ;;; END COMMAND MAP
         };
     }
@@ -373,7 +368,3 @@ namespace PpsMenu
         public int GetHashCode(KeyValuePair<string, string> obj) => obj.Key.GetHashCode();
     }
 }
-
-
-
-
