@@ -222,6 +222,7 @@ namespace PpsMenu
                 new MenuItem { Key = "Bazovi", Label = "Bazovi", Description = "- В сивил сменя базовите коти на много профили наведнъж, като му задаваш разстоянието от кота глава релса до базовата кота", AutoCADCommand = "Bazovi" },
                 new MenuItem { Key = "RamkaLR", Label = "RamkaLR", Description = "- Мести напречните профили в ляво и дясно, като го правиш за повече профили едновременно и с по-голяма стойност", AutoCADCommand = "RamkaLR" },
                 new MenuItem { Key = "RWCedit", Label = "RWCedit", Description = "- В сивил манипулираш (местиш) нагоре надолу с по 1м един или няколко профила наведнъж", AutoCADCommand = "RWCedit" },
+                new MenuItem { Key = "BestFit", Label = "BestFit", Description = "- От заснети сивилски точки на лява и дясна релсова нишка, прави две оси с полилиния, като едната е raw - минава през средата на всяки две заснети точки и ги свързва с прави, а другата е полилиния, която съдържа и криви и на която можем да напишем колко да е максималното отместване от raw линията", AutoCADCommand = "BestFit" },
             // ;;; END DCL CIVIL ITEMS
             }},
 
@@ -359,6 +360,7 @@ namespace PpsMenu
             { "WWD", "WWD" },
             { "WWS", "WWS" },
             { "WWL", "WWL" },
+            { "BestFit", "BestFit" },
         // ;;; END COMMAND MAP
         };
     }
