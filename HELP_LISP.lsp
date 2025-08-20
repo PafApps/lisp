@@ -198,6 +198,7 @@ namespace PpsMenu
                 new MenuItem { Key = "iskam", Label = "iskam", Description = "- Добавя предложение/желание за нова команда или функционалност в сайта на програмите", AutoCADCommand = "iskam" },
                 new MenuItem { Key = "CUIPAF", Label = "CUIPAF", Description = "- При ON заменя бутоните F1 - с отваряне на страницата с командите в PPS и F5 - с командата LISPLOAD. При OFF връща старите команди. Добавя и меню с команди", AutoCADCommand = "CUIPAF" },
                 new MenuItem { Key = "WWL", Label = "WWL", Description = "- Команда, която прилича на WW, но освен че пренася от напречния профил в ситуация точки където сме цъкнали, ги пренася с коти, за да можем после да направил вертикална планировка", AutoCADCommand = "WWL" },
+                new MenuItem { Key = "c2s", Label = "c2s", Description = "- Пренасяне на очертания/обекти от Напречни профили в ситуация (като ww само, че в два отделни файла)", AutoCADCommand = "c2s" },
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -361,6 +362,7 @@ namespace PpsMenu
             { "s2c", "s2c" },
             { "WWL", "WWL" },
             { "BestFit", "BestFit" },
+            { "c2s", "c2s" },
         // ;;; END COMMAND MAP
         };
     }
