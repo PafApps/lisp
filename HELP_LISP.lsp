@@ -203,6 +203,7 @@ namespace PpsMenu
                 new MenuItem { Key = "WWL", Label = "WWL", Description = "- Команда, която прилича на WW, но освен че пренася от напречния профил в ситуация точки където сме цъкнали, ги пренася с коти, за да можем после да направил вертикална планировка", AutoCADCommand = "WWL" },
                 new MenuItem { Key = "c2s", Label = "c2s", Description = "- Пренасяне на очертания/обекти от Напречни профили в ситуация (като ww само, че в два отделни файла)", AutoCADCommand = "c2s" },
                 new MenuItem { Key = "wwcivil", Label = "wwcivil", Description = "- Пренасяне на очертания/обекти от напречни в ситуация, като в ситуация трябва да имате алаймът и просто го маркиране него - може да работи и в два отделни файла", AutoCADCommand = "wwcivil" },
+                new MenuItem { Key = "LAYERCHANGE", Label = "LAYERCHANGE", Description = "- Във файла Layers - change Names.csv на първа колона са официалните слоеве, които сме възприели, срещу всеки слой на всяка следваща колона е поставен слой, който идва от стари обекти и с командата LayerChange този стар слой бива преправян в новия приет. Ако стария слой го няма във файла, той се добавя с командата LAYER-ALIAS-MANAGER", AutoCADCommand = "LAYERCHANGE" },
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -371,6 +372,7 @@ namespace PpsMenu
             { "LAQON", "LAQON" },
             { "ResetAtt", "ResetAtt" },
             { "MANAGELAYERS", "MANAGELAYERS" },
+            { "LAYERCHANGE", "LAYERCHANGE" },
         // ;;; END COMMAND MAP
         };
     }
