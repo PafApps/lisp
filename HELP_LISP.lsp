@@ -136,6 +136,7 @@ namespace PpsMenu
                 new MenuItem { Key = "BK", Label = "BK", Description = "- Добавя базовите коти в атрибута на скарата на напречния профил", AutoCADCommand = "BK" },
                 new MenuItem { Key = "LAQON", Label = "LAQON", Description = "- Светва всички слоеве които има във файла за ограждане на количества. При Lispload се гасят.", AutoCADCommand = "LAQON" },
                 new MenuItem { Key = "ResetAtt", Label = "ResetAtt", Description = "- Занулява всички стойности на таблицата в количества", AutoCADCommand = "ResetAtt" },
+                new MenuItem { Key = "MANAGELAYERS", Label = "MANAGELAYERS", Description = "- Добавя/Премахва слоеве от файла Layers-H2B.csv , който служи за светкане и изгасяне на слоевете при командите QB и QH при ограждане на количествата", AutoCADCommand = "MANAGELAYERS" },
             // ;;; END DCL NAPRECHNI ITEMS
             }},
 
@@ -369,6 +370,7 @@ namespace PpsMenu
             { "wwcivil", "wwcivil" },
             { "LAQON", "LAQON" },
             { "ResetAtt", "ResetAtt" },
+            { "MANAGELAYERS", "MANAGELAYERS" },
         // ;;; END COMMAND MAP
         };
     }
