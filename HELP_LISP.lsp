@@ -134,6 +134,7 @@ namespace PpsMenu
                 new MenuItem { Key = "QB", Label = "QB", Description = "- ограждане на всички количества 1 по 1, като изолира нужните слоеве, маркират се обектите между които да се пусне граница и се огражда с Boundery. По-надеждно е от QH", AutoCADCommand = "QB" },
                 new MenuItem { Key = "d3t", Label = "d3t", Description = "- изкарва теренните коти в напречен профил през 1 метър.", AutoCADCommand = "d3t" },
                 new MenuItem { Key = "BK", Label = "BK", Description = "- Добавя базовите коти в атрибута на скарата на напречния профил", AutoCADCommand = "BK" },
+                new MenuItem { Key = "LAQON", Label = "LAQON", Description = "- Светва всички слоеве които има във файла за ограждане на количества. При Lispload се гасят.", AutoCADCommand = "LAQON" },
             // ;;; END DCL NAPRECHNI ITEMS
             }},
 
@@ -365,6 +366,7 @@ namespace PpsMenu
             { "BestFit", "BestFit" },
             { "c2s", "c2s" },
             { "wwcivil", "wwcivil" },
+            { "LAQON", "LAQON" },
         // ;;; END COMMAND MAP
         };
     }
