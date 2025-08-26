@@ -135,6 +135,7 @@ namespace PpsMenu
                 new MenuItem { Key = "d3t", Label = "d3t", Description = "- изкарва теренните коти в напречен профил през 1 метър.", AutoCADCommand = "d3t" },
                 new MenuItem { Key = "BK", Label = "BK", Description = "- Добавя базовите коти в атрибута на скарата на напречния профил", AutoCADCommand = "BK" },
                 new MenuItem { Key = "LAQON", Label = "LAQON", Description = "- Светва всички слоеве които има във файла за ограждане на количества. При Lispload се гасят.", AutoCADCommand = "LAQON" },
+                new MenuItem { Key = "ResetAtt", Label = "ResetAtt", Description = "- Занулява всички стойности на таблицата в количества", AutoCADCommand = "ResetAtt" },
             // ;;; END DCL NAPRECHNI ITEMS
             }},
 
@@ -367,6 +368,7 @@ namespace PpsMenu
             { "c2s", "c2s" },
             { "wwcivil", "wwcivil" },
             { "LAQON", "LAQON" },
+            { "ResetAtt", "ResetAtt" },
         // ;;; END COMMAND MAP
         };
     }
