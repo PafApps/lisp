@@ -137,6 +137,7 @@ namespace PpsMenu
                 new MenuItem { Key = "LAQON", Label = "LAQON", Description = "- Светва всички слоеве които има във файла за ограждане на количества. При Lispload се гасят.", AutoCADCommand = "LAQON" },
                 new MenuItem { Key = "ResetAtt", Label = "ResetAtt", Description = "- Занулява всички стойности на таблицата в количества", AutoCADCommand = "ResetAtt" },
                 new MenuItem { Key = "MANAGELAYERS", Label = "MANAGELAYERS", Description = "- Добавя/Премахва слоеве от файла Layers-H2B.csv , който служи за светкане и изгасяне на слоевете при командите QB и QH при ограждане на количествата", AutoCADCommand = "MANAGELAYERS" },
+                new MenuItem { Key = "outline", Label = "outline", Description = "- Обединява ограждания които се допират. Също така създава външна граница на маркирани обекти, но след това трие обектите.", AutoCADCommand = "outline" },
             // ;;; END DCL NAPRECHNI ITEMS
             }},
 
@@ -375,6 +376,7 @@ namespace PpsMenu
             { "MANAGELAYERS", "MANAGELAYERS" },
             { "LAYERCHANGE", "LAYERCHANGE" },
             { "LAYER-ALIAS-MANAGER", "LAYER-ALIAS-MANAGER" },
+            { "outline", "outline" },
         // ;;; END COMMAND MAP
         };
     }
