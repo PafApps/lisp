@@ -73,6 +73,7 @@ namespace PpsMenu
                 new MenuItem { Key = "MTB", Label = "MTB", Description = "- същото като MTA, но за блокове.", AutoCADCommand = "MTB" },
                 new MenuItem { Key = "WWD", Label = "WWD", Description = "- Обратна команда на WW. Пренасяш обекти от ситуация в напречен профил. Всичко се случва в един файл", AutoCADCommand = "WWD" },
                 new MenuItem { Key = "s2c", Label = "s2c", Description = "- Пренасяте обекти от ситуация в напречен профил (в два отделни файла)", AutoCADCommand = "s2c" },
+                new MenuItem { Key = "z0", Label = "z0", Description = "- Слага z = 0 на всички обекти във файла", AutoCADCommand = "z0" },
              // ;;; END DCL SITUACIA ITEMS
             }},
 
@@ -381,6 +382,7 @@ namespace PpsMenu
             { "outline", "outline" },
             { "DK", "DK" },
             { "TITUL", "TITUL" },
+            { "z0", "z0" },
         // ;;; END COMMAND MAP
         };
     }
