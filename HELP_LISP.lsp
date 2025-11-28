@@ -232,6 +232,7 @@ namespace PpsMenu
                 new MenuItem { Key = "RamkaLR", Label = "RamkaLR", Description = "- Мести напречните профили в ляво и дясно, като го правиш за повече профили едновременно и с по-голяма стойност", AutoCADCommand = "RamkaLR" },
                 new MenuItem { Key = "RWCedit", Label = "RWCedit", Description = "- В сивил манипулираш (местиш) нагоре надолу с по 1м един или няколко профила наведнъж", AutoCADCommand = "RWCedit" },
                 new MenuItem { Key = "BestFit", Label = "BestFit", Description = "- От заснети сивилски точки на лява и дясна релсова нишка, прави две оси с полилиния, като едната е raw - минава през средата на всeки две заснети точки и ги свързва с прави, а другата е полилиния, която съдържа и криви и на която можем да напишем колко да е максималното отместване от raw линията", AutoCADCommand = "BestFit" },
+                new MenuItem { Key = "TITUL", Label = "TITUL", Description = "- Изкарване на име на FeatureLine и KM - В СИВИЛ маркираме алаймънт и програмата изкарва имената на всички фючър линии с километрите където пресичат алаймънта", AutoCADCommand = "TITUL" },
             // ;;; END DCL CIVIL ITEMS
             }},
 
@@ -379,6 +380,7 @@ namespace PpsMenu
             { "LAYER-ALIAS-MANAGER", "LAYER-ALIAS-MANAGER" },
             { "outline", "outline" },
             { "DK", "DK" },
+            { "TITUL", "TITUL" },
         // ;;; END COMMAND MAP
         };
     }
