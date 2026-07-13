@@ -141,6 +141,7 @@ namespace PpsMenu
                 new MenuItem { Key = "MANAGELAYERS", Label = "MANAGELAYERS", Description = "- Добавя/Премахва слоеве от файла Layers-H2B.csv , който служи за светкане и изгасяне на слоевете при командите QB и QH при ограждане на количествата", AutoCADCommand = "MANAGELAYERS" },
                 new MenuItem { Key = "outline", Label = "outline", Description = "- Обединява ограждания които се допират. Също така създава външна граница на маркирани обекти, но след това трие обектите.", AutoCADCommand = "outline" },
                 new MenuItem { Key = "DK", Label = "DK", Description = "- Надписва дъно канавка в напречните профили", AutoCADCommand = "DK" },
+                new MenuItem { Key = "HUMUS", Label = "HUMUS", Description = "- Маркирате терена и проектните откоси и посочвате дълбочина и изчертава хумуса, като му огражда и количеството - слага и дименсия за подготовка на земната основа", AutoCADCommand = "HUMUS" },
             // ;;; END DCL NAPRECHNI ITEMS
             }},
 
@@ -385,6 +386,7 @@ namespace PpsMenu
             { "TITUL", "TITUL" },
             { "z0", "z0" },
             { "UNROLL", "UNROLL" },
+            { "HUMUS", "HUMUS" },
         // ;;; END COMMAND MAP
         };
     }
