@@ -211,6 +211,7 @@ namespace PpsMenu
                 new MenuItem { Key = "wwcivil", Label = "wwcivil", Description = "- Пренасяне на очертания/обекти от напречни в ситуация, като в ситуация трябва да имате алаймът и просто го маркиране него - може да работи и в два отделни файла", AutoCADCommand = "wwcivil" },
                 new MenuItem { Key = "LAYERCHANGE", Label = "LAYERCHANGE", Description = "- Във файла Layers - change Names.csv на първа колона са официалните слоеве, които сме възприели, срещу всеки слой на всяка следваща колона е поставен слой, който идва от стари обекти и с командата LayerChange този стар слой бива преправян в новия приет. Ако стария слой го няма във файла, той се добавя с командата LAYER-ALIAS-MANAGER", AutoCADCommand = "LAYERCHANGE" },
                 new MenuItem { Key = "LAYER-ALIAS-MANAGER", Label = "LAYER-ALIAS-MANAGER", Description = "- Добавя и трие слоеве от файла Layers - change Names.csv чрез който после с командата LayerChange сменя старите имена на слоеве с новите уточнени такива", AutoCADCommand = "LAYER-ALIAS-MANAGER" },
+                new MenuItem { Key = "TxtWidth", Label = "TxtWidth", Description = "- Автоматично задава width На TEXT и MTEXT", AutoCADCommand = "TxtWidth" },
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -389,6 +390,7 @@ namespace PpsMenu
             { "UNROLL", "UNROLL" },
             { "HUMUS", "HUMUS" },
             { "SURFPREP", "SURFPREP" },
+            { "TxtWidth", "TxtWidth" },
         // ;;; END COMMAND MAP
         };
     }
