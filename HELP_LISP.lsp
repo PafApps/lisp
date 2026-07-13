@@ -142,6 +142,7 @@ namespace PpsMenu
                 new MenuItem { Key = "outline", Label = "outline", Description = "- Обединява ограждания които се допират. Също така създава външна граница на маркирани обекти, но след това трие обектите.", AutoCADCommand = "outline" },
                 new MenuItem { Key = "DK", Label = "DK", Description = "- Надписва дъно канавка в напречните профили", AutoCADCommand = "DK" },
                 new MenuItem { Key = "HUMUS", Label = "HUMUS", Description = "- Маркирате терена и проектните откоси и посочвате дълбочина и изчертава хумуса, като му огражда и количеството - слага и дименсия за подготовка на земната основа", AutoCADCommand = "HUMUS" },
+                new MenuItem { Key = "SURFPREP", Label = "SURFPREP", Description = "- Слага дименсия за подготовка на основата. Маркирате всички профили и ги слага на всички", AutoCADCommand = "SURFPREP" },
             // ;;; END DCL NAPRECHNI ITEMS
             }},
 
@@ -387,6 +388,7 @@ namespace PpsMenu
             { "z0", "z0" },
             { "UNROLL", "UNROLL" },
             { "HUMUS", "HUMUS" },
+            { "SURFPREP", "SURFPREP" },
         // ;;; END COMMAND MAP
         };
     }
