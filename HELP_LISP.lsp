@@ -180,7 +180,7 @@ namespace PpsMenu
                 new MenuItem { Key = "copyVp", Label = "copyVp", Description = "- копира горните лейаути на надлъжния профил при долните /когато са направени чрез MAPWSPACE/", AutoCADCommand = "copyVp" },
                 new MenuItem { Key = "c2l", Label = "c2l", Description = "- копира избран от вас обект/обекти в избрани от вас лейаути във файла", AutoCADCommand = "c2l" },
                 new MenuItem { Key = "c2al", Label = "c2al", Description = "- копира избран от вас обект/обекти във всички лейаути във файла", AutoCADCommand = "c2al" },
-                new MenuItem { Key = "selectRWC", Label = "selectRWC", Description = "- маркира последователно по Y рамките на напречните профили, за да може да се направят Layout-и с MAPWSPACE", AutoCADCommand = "selectRWC" },
+                new MenuItem { Key = "selectRWC", Label = "selectRWC", Description = "- маркира последователно спрямо километража рамките на напречните профили, за да може да се направят Layout-и с MAPWSPACE", AutoCADCommand = "selectRWC" },
             // ;;; END DCL LAYOUTI ITEMS
             }},
 
