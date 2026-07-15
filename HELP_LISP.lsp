@@ -143,6 +143,7 @@ namespace PpsMenu
                 new MenuItem { Key = "DK", Label = "DK", Description = "- Надписва дъно канавка в напречните профили", AutoCADCommand = "DK" },
                 new MenuItem { Key = "HUMUS", Label = "HUMUS", Description = "- Маркирате терена и проектните откоси и посочвате дълбочина и изчертава хумуса, като му огражда и количеството - слага и дименсия за подготовка на земната основа", AutoCADCommand = "HUMUS" },
                 new MenuItem { Key = "SURFPREP", Label = "SURFPREP", Description = "- Слага дименсия за подготовка на основата. Маркирате всички профили и ги слага на всички", AutoCADCommand = "SURFPREP" },
+                new MenuItem { Key = "RENUM_PROFILES", Label = "RENUM_PROFILES", Description = "- Преномерира номерата в рамките на напречните профили спрямо километража.", AutoCADCommand = "RENUM_PROFILES" },
             // ;;; END DCL NAPRECHNI ITEMS
             }},
 
@@ -393,6 +394,7 @@ namespace PpsMenu
             { "SURFPREP", "SURFPREP" },
             { "TxtWidth", "TxtWidth" },
             { "PPSTOOLBAR", "PPSTOOLBAR" },
+            { "RENUM_PROFILES", "RENUM_PROFILES" },
         // ;;; END COMMAND MAP
         };
     }
