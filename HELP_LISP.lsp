@@ -74,6 +74,7 @@ namespace PpsMenu
                 new MenuItem { Key = "WWD", Label = "WWD", Description = "- Обратна команда на WW. Пренасяш обекти от ситуация в напречен профил. Всичко се случва в един файл", AutoCADCommand = "WWD" },
                 new MenuItem { Key = "s2c", Label = "s2c", Description = "- Пренасяте обекти от ситуация в напречен профил (в два отделни файла)", AutoCADCommand = "s2c" },
                 new MenuItem { Key = "z0", Label = "z0", Description = "- Слага z = 0 на всички обекти във файла", AutoCADCommand = "z0" },
+                new MenuItem { Key = "CUSTOMLINE", Label = "CUSTOMLINE", Description = "- Създава ваш собствен стил линия (с текст или символи)", AutoCADCommand = "CUSTOMLINE" },
              // ;;; END DCL SITUACIA ITEMS
             }},
 
@@ -395,6 +396,7 @@ namespace PpsMenu
             { "TxtWidth", "TxtWidth" },
             { "PPSTOOLBAR", "PPSTOOLBAR" },
             { "RENUM_PROFILES", "RENUM_PROFILES" },
+            { "CUSTOMLINE", "CUSTOMLINE" },
         // ;;; END COMMAND MAP
         };
     }
