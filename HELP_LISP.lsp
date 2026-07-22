@@ -160,6 +160,7 @@ namespace PpsMenu
                 new MenuItem { Key = "nmove", Label = "nmove", Description = "- Премества обекти в блокове и XREF без да се налага да влизате в тях. (Внимавайте защото прави save На xref дори да е отворен!)", AutoCADCommand = "nmove" },
                 new MenuItem { Key = "delblocks", Label = "delblocks", Description = "- Изтрива избран блок или блокове от файла", AutoCADCommand = "delblocks" },
                 new MenuItem { Key = "wfb", Label = "wfb", Description = "- Променя width factor на текст, който се намира в блок", AutoCADCommand = "wfb" },
+                new MenuItem { Key = "SBURST", Label = "SBURST", Description = "- Разрешава explode на маркираните блокове, ако е забранено и ги взивява, като вривява и всички вложени блокове!", AutoCADCommand = "SBURST" },
             // ;;; END DCL BLOKOVE ITEMS
             }},
 
@@ -397,6 +398,7 @@ namespace PpsMenu
             { "PPSTOOLBAR", "PPSTOOLBAR" },
             { "RENUM_PROFILES", "RENUM_PROFILES" },
             { "CUSTOMLINE", "CUSTOMLINE" },
+            { "SBURST", "SBURST" },
         // ;;; END COMMAND MAP
         };
     }
