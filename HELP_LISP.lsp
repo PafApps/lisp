@@ -75,6 +75,7 @@ namespace PpsMenu
                 new MenuItem { Key = "s2c", Label = "s2c", Description = "- Пренасяте обекти от ситуация в напречен профил (в два отделни файла)", AutoCADCommand = "s2c" },
                 new MenuItem { Key = "z0", Label = "z0", Description = "- Слага z = 0 на всички обекти във файла", AutoCADCommand = "z0" },
                 new MenuItem { Key = "CUSTOMLINE", Label = "CUSTOMLINE", Description = "- Създава ваш собствен стил линия (с текст или символи)", AutoCADCommand = "CUSTOMLINE" },
+                new MenuItem { Key = "TKMEXP", Label = "TKMEXP", Description = "- Изкарва регистър на ТКМ шахтите, с информацията в атрибутите и координати на 4-те ъгъла на шахтата.", AutoCADCommand = "TKMEXP" },
              // ;;; END DCL SITUACIA ITEMS
             }},
 
@@ -399,6 +400,7 @@ namespace PpsMenu
             { "RENUM_PROFILES", "RENUM_PROFILES" },
             { "CUSTOMLINE", "CUSTOMLINE" },
             { "SBURST", "SBURST" },
+            { "TKMEXP", "TKMEXP" },
         // ;;; END COMMAND MAP
         };
     }
