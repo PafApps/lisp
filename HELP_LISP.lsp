@@ -162,6 +162,7 @@ namespace PpsMenu
                 new MenuItem { Key = "delblocks", Label = "delblocks", Description = "- Изтрива избран блок или блокове от файла", AutoCADCommand = "delblocks" },
                 new MenuItem { Key = "wfb", Label = "wfb", Description = "- Променя width factor на текст, който се намира в блок", AutoCADCommand = "wfb" },
                 new MenuItem { Key = "SBURST", Label = "SBURST", Description = "- Разрешава explode на маркираните блокове, ако е забранено и ги взивява, като вривява и всички вложени блокове!", AutoCADCommand = "SBURST" },
+                new MenuItem { Key = "AttReNum", Label = "AttReNum", Description = "- Слага поредна номерация на избран атрибут, като маркираш блоковете един по един. Преномериране на блокове", AutoCADCommand = "AttReNum" },
             // ;;; END DCL BLOKOVE ITEMS
             }},
 
@@ -401,6 +402,7 @@ namespace PpsMenu
             { "CUSTOMLINE", "CUSTOMLINE" },
             { "SBURST", "SBURST" },
             { "TKMEXP", "TKMEXP" },
+            { "AttReNum", "AttReNum" },
         // ;;; END COMMAND MAP
         };
     }
