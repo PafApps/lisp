@@ -77,6 +77,7 @@ namespace PpsMenu
                 new MenuItem { Key = "CUSTOMLINE", Label = "CUSTOMLINE", Description = "- Създава ваш собствен стил линия (с текст или символи)", AutoCADCommand = "CUSTOMLINE" },
                 new MenuItem { Key = "TKMEXP", Label = "TKMEXP", Description = "- Изкарва регистър на ТКМ шахтите, с информацията в атрибутите и координати на 4-те ъгъла на шахтата.", AutoCADCommand = "TKMEXP" },
                 new MenuItem { Key = "M1EXPORT", Label = "M1EXPORT", Description = "- Изрязва част от ситуация и я прави на нов файл. Маркираш рамката в която искаш да изреже.", AutoCADCommand = "M1EXPORT" },
+                new MenuItem { Key = "AutoLayout", Label = "AutoLayout", Description = "- Прави лейаути като се маркира рамката в ситуация, задава се мащаба. Има опция за вкарване на блок от темплейт файл, както и за маркиране на много последователни рамки", AutoCADCommand = "AutoLayout" },
              // ;;; END DCL SITUACIA ITEMS
             }},
 
@@ -405,6 +406,7 @@ namespace PpsMenu
             { "TKMEXP", "TKMEXP" },
             { "AttReNum", "AttReNum" },
             { "M1EXPORT", "M1EXPORT" },
+            { "AutoLayout", "AutoLayout" },
         // ;;; END COMMAND MAP
         };
     }
