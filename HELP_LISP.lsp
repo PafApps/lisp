@@ -78,6 +78,7 @@ namespace PpsMenu
                 new MenuItem { Key = "TKMEXP", Label = "TKMEXP", Description = "- Изкарва регистър на ТКМ шахтите, с информацията в атрибутите и координати на 4-те ъгъла на шахтата.", AutoCADCommand = "TKMEXP" },
                 new MenuItem { Key = "M1EXPORT", Label = "M1EXPORT", Description = "- Изрязва част от ситуация и я прави на нов файл. Маркираш рамката в която искаш да изреже.", AutoCADCommand = "M1EXPORT" },
                 new MenuItem { Key = "AutoLayout", Label = "AutoLayout", Description = "- Прави лейаути като се маркира рамката в ситуация, задава се мащаба. Има опция за вкарване на блок от темплейт файл, както и за маркиране на много последователни рамки", AutoCADCommand = "AutoLayout" },
+                new MenuItem { Key = "3D2D", Label = "3D2D", Description = "- Преобразува 3D полилиния в 2D полилиния със Z=0", AutoCADCommand = "3D2D" },
              // ;;; END DCL SITUACIA ITEMS
             }},
 
@@ -407,6 +408,7 @@ namespace PpsMenu
             { "AttReNum", "AttReNum" },
             { "M1EXPORT", "M1EXPORT" },
             { "AutoLayout", "AutoLayout" },
+            { "3D2D", "3D2D" },
         // ;;; END COMMAND MAP
         };
     }
