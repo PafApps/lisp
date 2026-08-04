@@ -150,6 +150,7 @@ namespace PpsMenu
                 new MenuItem { Key = "SURFPREP", Label = "SURFPREP", Description = "- Слага дименсия за подготовка на основата. Маркирате всички профили и ги слага на всички", AutoCADCommand = "SURFPREP" },
                 new MenuItem { Key = "RENUM_PROFILES", Label = "RENUM_PROFILES", Description = "- Преномерира номерата в рамките на напречните профили спрямо километража.", AutoCADCommand = "RENUM_PROFILES" },
                 new MenuItem { Key = "RWCLayout", Label = "RWCLayout", Description = "- Прави лейаути на напречните, почти като MapPSpace. Маркираш темплейт след това маркираш всички напречни и чакаш", AutoCADCommand = "RWCLayout" },
+                new MenuItem { Key = "RWCEditL", Label = "RWCEditL", Description = "- Коригира лейаута на маркираната рамка в модела", AutoCADCommand = "RWCEditL" },
             // ;;; END DCL NAPRECHNI ITEMS
             }},
 
@@ -411,6 +412,7 @@ namespace PpsMenu
             { "AutoLayout", "AutoLayout" },
             { "3D2D", "3D2D" },
             { "RWCLayout", "RWCLayout" },
+            { "RWCEditL", "RWCEditL" },
         // ;;; END COMMAND MAP
         };
     }
