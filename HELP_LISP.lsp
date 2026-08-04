@@ -149,6 +149,7 @@ namespace PpsMenu
                 new MenuItem { Key = "HUMUS", Label = "HUMUS", Description = "- Маркирате терена и проектните откоси и посочвате дълбочина и изчертава хумуса, като му огражда и количеството - слага и дименсия за подготовка на земната основа", AutoCADCommand = "HUMUS" },
                 new MenuItem { Key = "SURFPREP", Label = "SURFPREP", Description = "- Слага дименсия за подготовка на основата. Маркирате всички профили и ги слага на всички", AutoCADCommand = "SURFPREP" },
                 new MenuItem { Key = "RENUM_PROFILES", Label = "RENUM_PROFILES", Description = "- Преномерира номерата в рамките на напречните профили спрямо километража.", AutoCADCommand = "RENUM_PROFILES" },
+                new MenuItem { Key = "RWCLayout", Label = "RWCLayout", Description = "- Прави лейаути на напречните, почти като MapPSpace. Маркираш темплейт след това маркираш всички напречни и чакаш", AutoCADCommand = "RWCLayout" },
             // ;;; END DCL NAPRECHNI ITEMS
             }},
 
@@ -409,6 +410,7 @@ namespace PpsMenu
             { "M1EXPORT", "M1EXPORT" },
             { "AutoLayout", "AutoLayout" },
             { "3D2D", "3D2D" },
+            { "RWCLayout", "RWCLayout" },
         // ;;; END COMMAND MAP
         };
     }
