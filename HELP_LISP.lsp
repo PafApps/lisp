@@ -101,6 +101,7 @@ namespace PpsMenu
                 new MenuItem { Key = "DIt", Label = "DIt", Description = "- Измерва разстоянието между две точки и го записва в избран TEXT или MTEXT", AutoCADCommand = "DIt" },
                 new MenuItem { Key = "LNi", Label = "LNi", Description = "- Избираш вертикален мащаб (1:1 , 1:10, 1:100) и мерни единици (проценти или промили) и чертаеш линия на която можеш да сменяш наклона преди да си маркирал втората точка. С + и - или със Space и число показваш какъв наклон да е линията", AutoCADCommand = "LNi" },
                 new MenuItem { Key = "UNROLL", Label = "UNROLL", Description = "- Изправя ситуации които са в криви за да се оформи графа ситуация във надлъжния профил", AutoCADCommand = "UNROLL" },
+                new MenuItem { Key = "RWlLayout", Label = "RWlLayout", Description = "- Прави лейаути на надлъжните прогили. Маркираш темплейт след това маркираш горните рамки от надлъжния профил", AutoCADCommand = "RWlLayout" },
             // ;;; END DCL NADLZHNI ITEMS 
             }},
 
@@ -413,6 +414,7 @@ namespace PpsMenu
             { "3D2D", "3D2D" },
             { "RWCLayout", "RWCLayout" },
             { "RWCEditL", "RWCEditL" },
+            { "RWlLayout", "RWlLayout" },
         // ;;; END COMMAND MAP
         };
     }
