@@ -225,6 +225,7 @@ namespace PpsMenu
                 new MenuItem { Key = "LAYER-ALIAS-MANAGER", Label = "LAYER-ALIAS-MANAGER", Description = "- Добавя и трие слоеве от файла Layers - change Names.csv чрез който после с командата LayerChange сменя старите имена на слоеве с новите уточнени такива", AutoCADCommand = "LAYER-ALIAS-MANAGER" },
                 new MenuItem { Key = "TxtWidth", Label = "TxtWidth", Description = "- Автоматично задава width На TEXT и MTEXT", AutoCADCommand = "TxtWidth" },
                 new MenuItem { Key = "PPSTOOLBAR", Label = "PPSTOOLBAR", Description = "- Изкарва Toolbar с добавени команди от ППС", AutoCADCommand = "PPSTOOLBAR" },
+                new MenuItem { Key = "EditLayout", Label = "EditLayout", Description = "- отваря меню с два бутона за командите 	RWCEditL и RWLEditL , в случай, че не се сетите за името им.", AutoCADCommand = "EditLayout" },
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -417,6 +418,7 @@ namespace PpsMenu
             { "RWCEditL", "RWCEditL" },
             { "RWlLayout", "RWlLayout" },
             { "RWLEditL", "RWLEditL" },
+            { "EditLayout", "EditLayout" },
         // ;;; END COMMAND MAP
         };
     }
