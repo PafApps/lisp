@@ -228,6 +228,7 @@ namespace PpsMenu
                 new MenuItem { Key = "EditLayout", Label = "EditLayout", Description = "- отваря меню с два бутона за командите 	RWCEditL и RWLEditL , в случай, че не се сетите за името им.", AutoCADCommand = "EditLayout" },
                 new MenuItem { Key = "BatchData", Label = "BatchData", Description = "- Сменя датата на избрани от теб файлове, без да се налага да ги отваряш", AutoCADCommand = "BatchData" },
                 new MenuItem { Key = "BatchRemoveSign", Label = "BatchRemoveSign", Description = "- Премахва подписите на всички файлове от избрана от теб папка, без да се налага да отваряш файловете", AutoCADCommand = "BatchRemoveSign" },
+                new MenuItem { Key = "NewDimStyle", Label = "NewDimStyle", Description = "- Маркираме дименсионна линия и копира всичките и параметри и създава стил със същите параметри със зададено от нас име", AutoCADCommand = "NewDimStyle" },
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -423,6 +424,7 @@ namespace PpsMenu
             { "EditLayout", "EditLayout" },
             { "BatchData", "BatchData" },
             { "BatchRemoveSign", "BatchRemoveSign" },
+            { "NewDimStyle", "NewDimStyle" },
         // ;;; END COMMAND MAP
         };
     }
