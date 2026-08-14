@@ -194,6 +194,7 @@ namespace PpsMenu
                 new MenuItem { Key = "c2l", Label = "c2l", Description = "- копира избран от вас обект/обекти в избрани от вас лейаути във файла", AutoCADCommand = "c2l" },
                 new MenuItem { Key = "c2al", Label = "c2al", Description = "- копира избран от вас обект/обекти във всички лейаути във файла", AutoCADCommand = "c2al" },
                 new MenuItem { Key = "selectRWC", Label = "selectRWC", Description = "- маркира последователно спрямо километража рамките на напречните профили, за да може да се направят Layout-и с MAPWSPACE", AutoCADCommand = "selectRWC" },
+                new MenuItem { Key = "FixAllLayouts00", Label = "FixAllLayouts00", Description = "- Слага всички обекти в лейаутите на 0,0 сетва на ново хартия с нашите плотери и ако искаме вкарва рамка на вече направени от нас или чужди фирми лейаути", AutoCADCommand = "FixAllLayouts00" },
             // ;;; END DCL LAYOUTI ITEMS
             }},
 
@@ -427,6 +428,7 @@ namespace PpsMenu
             { "BatchRemoveSign", "BatchRemoveSign" },
             { "NewDimStyle", "NewDimStyle" },
             { "DITCHEND", "DITCHEND" },
+            { "FixAllLayouts00", "FixAllLayouts00" },
         // ;;; END COMMAND MAP
         };
     }
