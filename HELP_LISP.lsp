@@ -226,6 +226,7 @@ namespace PpsMenu
                 new MenuItem { Key = "TxtWidth", Label = "TxtWidth", Description = "- Автоматично задава width На TEXT и MTEXT", AutoCADCommand = "TxtWidth" },
                 new MenuItem { Key = "PPSTOOLBAR", Label = "PPSTOOLBAR", Description = "- Изкарва Toolbar с добавени команди от ППС", AutoCADCommand = "PPSTOOLBAR" },
                 new MenuItem { Key = "EditLayout", Label = "EditLayout", Description = "- отваря меню с два бутона за командите 	RWCEditL и RWLEditL , в случай, че не се сетите за името им.", AutoCADCommand = "EditLayout" },
+                new MenuItem { Key = "BatchData", Label = "BatchData", Description = "- Сменя датата на избрани от теб файлове, без да се налага да ги отваряш", AutoCADCommand = "BatchData" },
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -419,6 +420,7 @@ namespace PpsMenu
             { "RWlLayout", "RWlLayout" },
             { "RWLEditL", "RWLEditL" },
             { "EditLayout", "EditLayout" },
+            { "BatchData", "BatchData" },
         // ;;; END COMMAND MAP
         };
     }
