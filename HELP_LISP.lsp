@@ -227,6 +227,7 @@ namespace PpsMenu
                 new MenuItem { Key = "PPSTOOLBAR", Label = "PPSTOOLBAR", Description = "- Изкарва Toolbar с добавени команди от ППС", AutoCADCommand = "PPSTOOLBAR" },
                 new MenuItem { Key = "EditLayout", Label = "EditLayout", Description = "- отваря меню с два бутона за командите 	RWCEditL и RWLEditL , в случай, че не се сетите за името им.", AutoCADCommand = "EditLayout" },
                 new MenuItem { Key = "BatchData", Label = "BatchData", Description = "- Сменя датата на избрани от теб файлове, без да се налага да ги отваряш", AutoCADCommand = "BatchData" },
+                new MenuItem { Key = "BatchRemoveSign", Label = "BatchRemoveSign", Description = "- Премахва подписите на всички файлове от избрана от теб папка, без да се налага да отваряш файловете", AutoCADCommand = "BatchRemoveSign" },
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -421,6 +422,7 @@ namespace PpsMenu
             { "RWLEditL", "RWLEditL" },
             { "EditLayout", "EditLayout" },
             { "BatchData", "BatchData" },
+            { "BatchRemoveSign", "BatchRemoveSign" },
         // ;;; END COMMAND MAP
         };
     }
