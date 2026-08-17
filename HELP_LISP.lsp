@@ -233,6 +233,7 @@ namespace PpsMenu
                 new MenuItem { Key = "NewDimStyle", Label = "NewDimStyle", Description = "- Маркираме дименсионна линия и копира всичките и параметри и създава стил със същите параметри със зададено от нас име", AutoCADCommand = "NewDimStyle" },
                 new MenuItem { Key = "dwgopen", Label = "dwgopen", Description = "- За аутокад при двойно кликване на файла го отваря с аутокад в отделен прозорец, за СИВИЛ шифт и десен бутон и има добавен бутон за Open with Civil (за някои инсталации не работи!)", AutoCADCommand = "dwgopen" },
                 new MenuItem { Key = "dwgopeninone", Label = "dwgopeninone", Description = "- Ако искате при двойно кликване на файл да го отваря в същия прозорец, в който вече е отворен файл", AutoCADCommand = "dwgopeninone" },
+                new MenuItem { Key = "BackupMySettings", Label = "BackupMySettings", Description = "- Прави backup на .arg и .cui файлове - в тях се съдържат основните сетинги за аутокад и за сивил!", AutoCADCommand = "BackupMySettings" },
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -433,6 +434,7 @@ namespace PpsMenu
             { "FixAllLayouts00", "FixAllLayouts00" },
             { "dwgopen", "dwgopen" },
             { "dwgopeninone", "dwgopeninone" },
+            { "BackupMySettings", "BackupMySettings" },
         // ;;; END COMMAND MAP
         };
     }
