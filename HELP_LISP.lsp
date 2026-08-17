@@ -234,6 +234,7 @@ namespace PpsMenu
                 new MenuItem { Key = "dwgopen", Label = "dwgopen", Description = "- За аутокад при двойно кликване на файла го отваря с аутокад в отделен прозорец, за СИВИЛ шифт и десен бутон и има добавен бутон за Open with Civil (за някои инсталации не работи!)", AutoCADCommand = "dwgopen" },
                 new MenuItem { Key = "dwgopeninone", Label = "dwgopeninone", Description = "- Ако искате при двойно кликване на файл да го отваря в същия прозорец, в който вече е отворен файл", AutoCADCommand = "dwgopeninone" },
                 new MenuItem { Key = "BackupMySettings", Label = "BackupMySettings", Description = "- Прави backup на .arg и .cui файлове - в тях се съдържат основните сетинги за аутокад и за сивил!", AutoCADCommand = "BackupMySettings" },
+                new MenuItem { Key = "RestoreMySettings", Label = "RestoreMySettings", Description = "- Възстановява .arg и .cui файловете с настройките на вашия аутокад / сивил!", AutoCADCommand = "RestoreMySettings" },
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -435,6 +436,7 @@ namespace PpsMenu
             { "dwgopen", "dwgopen" },
             { "dwgopeninone", "dwgopeninone" },
             { "BackupMySettings", "BackupMySettings" },
+            { "RestoreMySettings", "RestoreMySettings" },
         // ;;; END COMMAND MAP
         };
     }
