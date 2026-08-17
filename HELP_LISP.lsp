@@ -231,6 +231,7 @@ namespace PpsMenu
                 new MenuItem { Key = "BatchData", Label = "BatchData", Description = "- Сменя датата на избрани от теб файлове, без да се налага да ги отваряш", AutoCADCommand = "BatchData" },
                 new MenuItem { Key = "BatchRemoveSign", Label = "BatchRemoveSign", Description = "- Премахва подписите на всички файлове от избрана от теб папка, без да се налага да отваряш файловете", AutoCADCommand = "BatchRemoveSign" },
                 new MenuItem { Key = "NewDimStyle", Label = "NewDimStyle", Description = "- Маркираме дименсионна линия и копира всичките и параметри и създава стил със същите параметри със зададено от нас име", AutoCADCommand = "NewDimStyle" },
+                new MenuItem { Key = "dwgopen", Label = "dwgopen", Description = "- За аутокад при двойно кликване на файла го отваря с аутокад в отделен прозорец, за СИВИЛ шифт и десен бутон и има добавен бутон за Open with Civil (за някои инсталации не работи!)", AutoCADCommand = "dwgopen" },
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -429,6 +430,7 @@ namespace PpsMenu
             { "NewDimStyle", "NewDimStyle" },
             { "DITCHEND", "DITCHEND" },
             { "FixAllLayouts00", "FixAllLayouts00" },
+            { "dwgopen", "dwgopen" },
         // ;;; END COMMAND MAP
         };
     }
