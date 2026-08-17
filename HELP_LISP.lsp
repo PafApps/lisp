@@ -236,6 +236,7 @@ namespace PpsMenu
                 new MenuItem { Key = "BackupMySettings", Label = "BackupMySettings", Description = "- Прави backup на .arg и .cui файлове - в тях се съдържат основните сетинги за аутокад и за сивил!", AutoCADCommand = "BackupMySettings" },
                 new MenuItem { Key = "RestoreMySettings", Label = "RestoreMySettings", Description = "- Възстановява .arg и .cui файловете с настройките на вашия аутокад / сивил!", AutoCADCommand = "RestoreMySettings" },
                 new MenuItem { Key = "ResetMyProfile", Label = "ResetMyProfile", Description = "- Ресетва към дефоултни настройки на Аутокада/Сивила ви!", AutoCADCommand = "ResetMyProfile" },
+                new MenuItem { Key = "db", Label = "db", Description = "- Draw order - закарва маркираните обекти най-отзад", AutoCADCommand = "db" },
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -439,6 +440,7 @@ namespace PpsMenu
             { "BackupMySettings", "BackupMySettings" },
             { "RestoreMySettings", "RestoreMySettings" },
             { "ResetMyProfile", "ResetMyProfile" },
+            { "db", "db" },
         // ;;; END COMMAND MAP
         };
     }
