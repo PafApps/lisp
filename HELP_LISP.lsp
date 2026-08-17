@@ -235,6 +235,7 @@ namespace PpsMenu
                 new MenuItem { Key = "dwgopeninone", Label = "dwgopeninone", Description = "- Ако искате при двойно кликване на файл да го отваря в същия прозорец, в който вече е отворен файл", AutoCADCommand = "dwgopeninone" },
                 new MenuItem { Key = "BackupMySettings", Label = "BackupMySettings", Description = "- Прави backup на .arg и .cui файлове - в тях се съдържат основните сетинги за аутокад и за сивил!", AutoCADCommand = "BackupMySettings" },
                 new MenuItem { Key = "RestoreMySettings", Label = "RestoreMySettings", Description = "- Възстановява .arg и .cui файловете с настройките на вашия аутокад / сивил!", AutoCADCommand = "RestoreMySettings" },
+                new MenuItem { Key = "ResetMyProfile", Label = "ResetMyProfile", Description = "- Ресетва към дефоултни настройки на Аутокада/Сивила ви!", AutoCADCommand = "ResetMyProfile" },
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -437,6 +438,7 @@ namespace PpsMenu
             { "dwgopeninone", "dwgopeninone" },
             { "BackupMySettings", "BackupMySettings" },
             { "RestoreMySettings", "RestoreMySettings" },
+            { "ResetMyProfile", "ResetMyProfile" },
         // ;;; END COMMAND MAP
         };
     }
