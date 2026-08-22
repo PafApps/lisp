@@ -242,6 +242,7 @@ namespace PpsMenu
                 new MenuItem { Key = "df", Label = "df", Description = "- Draw order - изкарва маркираните обекти най-отпред", AutoCADCommand = "df" },
                 new MenuItem { Key = "NL", Label = "NL", Description = "- Бърза и олеснена команда за създаване на layer", AutoCADCommand = "NL" },
                 new MenuItem { Key = "PDFall", Label = "PDFall", Description = "- Прави пдф-и на всички файлове - dwg, word и excel в избрана папка", AutoCADCommand = "PDFall" },
+                new MenuItem { Key = "PDFselect", Label = "PDFselect", Description = "- Прави pdf на избрани файлове. Може да заредите колкото искате файлове", AutoCADCommand = "PDFselect" },
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -451,6 +452,7 @@ namespace PpsMenu
             { "NL", "NL" },
             { "podpisittb", "podpisittb" },
             { "PDFall", "PDFall" },
+            { "PDFselect", "PDFselect" },
         // ;;; END COMMAND MAP
         };
     }
