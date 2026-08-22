@@ -241,6 +241,7 @@ namespace PpsMenu
                 new MenuItem { Key = "db", Label = "db", Description = "- Draw order - закарва маркираните обекти най-отзад", AutoCADCommand = "db" },
                 new MenuItem { Key = "df", Label = "df", Description = "- Draw order - изкарва маркираните обекти най-отпред", AutoCADCommand = "df" },
                 new MenuItem { Key = "NL", Label = "NL", Description = "- Бърза и олеснена команда за създаване на layer", AutoCADCommand = "NL" },
+                new MenuItem { Key = "PDFall", Label = "PDFall", Description = "- Прави пдф-и на всички файлове - dwg, word и excel в избрана папка", AutoCADCommand = "PDFall" },
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -449,6 +450,7 @@ namespace PpsMenu
             { "podpisiall", "podpisiall" },
             { "NL", "NL" },
             { "podpisittb", "podpisittb" },
+            { "PDFall", "PDFall" },
         // ;;; END COMMAND MAP
         };
     }
