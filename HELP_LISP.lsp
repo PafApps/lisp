@@ -80,6 +80,7 @@ namespace PpsMenu
                 new MenuItem { Key = "AutoLayout", Label = "AutoLayout", Description = "- Прави лейаути като се маркира рамката в ситуация, задава се мащаба. Има опция за вкарване на блок от темплейт файл, както и за маркиране на много последователни рамки", AutoCADCommand = "AutoLayout" },
                 new MenuItem { Key = "3D2D", Label = "3D2D", Description = "- Преобразува 3D полилиния в 2D полилиния със Z=0", AutoCADCommand = "3D2D" },
                 new MenuItem { Key = "DITCHEND", Label = "DITCHEND", Description = "- В сивилски файл поставяме блока за начало било и край на канавките, като взима километража и посоката от Алаймънта", AutoCADCommand = "DITCHEND" },
+                new MenuItem { Key = "tkmshaft", Label = "tkmshaft", Description = "- Поставя шахтите на ТКМ в ситуация, като ги завърта, ако се избере динамичния блок TKM-Shafts", AutoCADCommand = "tkmshaft" },
              // ;;; END DCL SITUACIA ITEMS
             }},
 
@@ -453,6 +454,7 @@ namespace PpsMenu
             { "podpisittb", "podpisittb" },
             { "PDFall", "PDFall" },
             { "PDFselect", "PDFselect" },
+            { "tkmshaft", "tkmshaft" },
         // ;;; END COMMAND MAP
         };
     }
