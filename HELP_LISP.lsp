@@ -196,6 +196,7 @@ namespace PpsMenu
                 new MenuItem { Key = "selectRWC", Label = "selectRWC", Description = "- маркира последователно спрямо километража рамките на напречните профили, за да може да се направят Layout-и с MAPWSPACE", AutoCADCommand = "selectRWC" },
                 new MenuItem { Key = "FixAllLayouts00", Label = "FixAllLayouts00", Description = "- Слага всички обекти в лейаутите на 0,0 сетва на ново хартия с нашите плотери и ако искаме вкарва рамка на вече направени от нас или чужди фирми лейаути", AutoCADCommand = "FixAllLayouts00" },
                 new MenuItem { Key = "podpisiall", Label = "podpisiall", Description = "- Вкарва подписите в ТТБ антетките на всички файлове в избрана папка", AutoCADCommand = "podpisiall" },
+                new MenuItem { Key = "podpisittb", Label = "podpisittb", Description = "- Вкарва подписите в ТТБ темплейтите на сървъра", AutoCADCommand = "podpisittb" },
             // ;;; END DCL LAYOUTI ITEMS
             }},
 
@@ -447,6 +448,7 @@ namespace PpsMenu
             { "df", "df" },
             { "podpisiall", "podpisiall" },
             { "NL", "NL" },
+            { "podpisittb", "podpisittb" },
         // ;;; END COMMAND MAP
         };
     }
