@@ -198,6 +198,7 @@ namespace PpsMenu
                 new MenuItem { Key = "FixAllLayouts00", Label = "FixAllLayouts00", Description = "- Слага всички обекти в лейаутите на 0,0 сетва на ново хартия с нашите плотери и ако искаме вкарва рамка на вече направени от нас или чужди фирми лейаути", AutoCADCommand = "FixAllLayouts00" },
                 new MenuItem { Key = "podpisiall", Label = "podpisiall", Description = "- Вкарва подписите в ТТБ антетките на всички файлове в избрана папка", AutoCADCommand = "podpisiall" },
                 new MenuItem { Key = "podpisittb", Label = "podpisittb", Description = "- Вкарва подписите в ТТБ темплейтите на сървъра", AutoCADCommand = "podpisittb" },
+                new MenuItem { Key = "RWCLayoutAdd", Label = "RWCLayoutAdd", Description = "- Прави и вмъква лейаут в напречните профили, като спрямо километража го вмъква и спрямо номера в рамката го именува", AutoCADCommand = "RWCLayoutAdd" },
             // ;;; END DCL LAYOUTI ITEMS
             }},
 
@@ -455,6 +456,7 @@ namespace PpsMenu
             { "PDFall", "PDFall" },
             { "PDFselect", "PDFselect" },
             { "tkmshaft", "tkmshaft" },
+            { "RWCLayoutAdd", "RWCLayoutAdd" },
         // ;;; END COMMAND MAP
         };
     }
