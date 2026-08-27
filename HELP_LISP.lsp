@@ -271,6 +271,7 @@ namespace PpsMenu
                 new MenuItem { Key = "RWCedit", Label = "RWCedit", Description = "- В сивил манипулираш (местиш) нагоре надолу с по 1м един или няколко профила наведнъж", AutoCADCommand = "RWCedit" },
                 new MenuItem { Key = "BestFit", Label = "BestFit", Description = "- От заснети сивилски точки на лява и дясна релсова нишка, прави две оси с полилиния, като едната е raw - минава през средата на всeки две заснети точки и ги свързва с прави, а другата е полилиния, която съдържа и криви и на която можем да напишем колко да е максималното отместване от raw линията", AutoCADCommand = "BestFit" },
                 new MenuItem { Key = "TITUL", Label = "TITUL", Description = "- Изкарване на име на FeatureLine и KM - В СИВИЛ маркираме алаймънт и програмата изкарва имената на всички фючър линии с километрите където пресичат алаймънта", AutoCADCommand = "TITUL" },
+                new MenuItem { Key = "MAKESURF", Label = "MAKESURF", Description = "- Автоматично прави повърхнина от брейк линии и граница, като задаваш името ѝ, избираш стила ѝ и посочваш една брейлиния и границата. Брейклиниите ги маркира като SelectSimilar", AutoCADCommand = "MAKESURF" },
             // ;;; END DCL CIVIL ITEMS
             }},
 
@@ -457,6 +458,7 @@ namespace PpsMenu
             { "PDFselect", "PDFselect" },
             { "tkmshaft", "tkmshaft" },
             { "RWCLayoutAdd", "RWCLayoutAdd" },
+            { "MAKESURF", "MAKESURF" },
         // ;;; END COMMAND MAP
         };
     }
