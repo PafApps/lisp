@@ -155,6 +155,7 @@ namespace PpsMenu
                 new MenuItem { Key = "RENUM_PROFILES", Label = "RENUM_PROFILES", Description = "- Преномерира номерата в рамките на напречните профили спрямо километража.", AutoCADCommand = "RENUM_PROFILES" },
                 new MenuItem { Key = "RWCLayout", Label = "RWCLayout", Description = "- Прави лейаути на напречните, почти като MapPSpace. Маркираш темплейт след това маркираш всички напречни и чакаш", AutoCADCommand = "RWCLayout" },
                 new MenuItem { Key = "RWCEditL", Label = "RWCEditL", Description = "- Коригира лейаута на маркираната рамка в модела", AutoCADCommand = "RWCEditL" },
+                new MenuItem { Key = "AreaHumus", Label = "AreaHumus", Description = "- Огражда хумуса в напречния профил. Слоевете трябва да са коректни, ако не са свържи се с Паф", AutoCADCommand = "AreaHumus" },
             // ;;; END DCL NAPRECHNI ITEMS
             }},
 
@@ -459,6 +460,7 @@ namespace PpsMenu
             { "tkmshaft", "tkmshaft" },
             { "RWCLayoutAdd", "RWCLayoutAdd" },
             { "MAKESURF", "MAKESURF" },
+            { "AreaHumus", "AreaHumus" },
         // ;;; END COMMAND MAP
         };
     }
