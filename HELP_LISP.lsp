@@ -156,6 +156,7 @@ namespace PpsMenu
                 new MenuItem { Key = "RWCLayout", Label = "RWCLayout", Description = "- Прави лейаути на напречните, почти като MapPSpace. Маркираш темплейт след това маркираш всички напречни и чакаш", AutoCADCommand = "RWCLayout" },
                 new MenuItem { Key = "RWCEditL", Label = "RWCEditL", Description = "- Коригира лейаута на маркираната рамка в модела", AutoCADCommand = "RWCEditL" },
                 new MenuItem { Key = "AreaHumus", Label = "AreaHumus", Description = "- Огражда хумуса в напречния профил. Слоевете трябва да са коректни, ако не са свържи се с Паф", AutoCADCommand = "AreaHumus" },
+                new MenuItem { Key = "AreaIzkop", Label = "AreaIzkop", Description = "- Огражда изкопа. При по-сложни изкопи може да дава грешки, затова преглеждайте! Помага преди това да е ограден хумуса.", AutoCADCommand = "AreaIzkop" },
             // ;;; END DCL NAPRECHNI ITEMS
             }},
 
@@ -461,6 +462,7 @@ namespace PpsMenu
             { "RWCLayoutAdd", "RWCLayoutAdd" },
             { "MAKESURF", "MAKESURF" },
             { "AreaHumus", "AreaHumus" },
+            { "AreaIzkop", "AreaIzkop" },
         // ;;; END COMMAND MAP
         };
     }
