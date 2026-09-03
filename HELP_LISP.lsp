@@ -157,6 +157,7 @@ namespace PpsMenu
                 new MenuItem { Key = "RWCEditL", Label = "RWCEditL", Description = "- Коригира лейаута на маркираната рамка в модела", AutoCADCommand = "RWCEditL" },
                 new MenuItem { Key = "AreaHumus", Label = "AreaHumus", Description = "- Огражда хумуса в напречния профил. Слоевете трябва да са коректни, ако не са свържи се с Паф", AutoCADCommand = "AreaHumus" },
                 new MenuItem { Key = "AreaIzkop", Label = "AreaIzkop", Description = "- Огражда изкопа. При по-сложни изкопи може да дава грешки, затова преглеждайте! Помага преди това да е ограден хумуса.", AutoCADCommand = "AreaIzkop" },
+                new MenuItem { Key = "AreaBZP", Label = "AreaBZP", Description = "- Огражда нов баласт, защитен пласт и подобрен пласт (ако има). Отново преглеждайте за грешки!", AutoCADCommand = "AreaBZP" },
             // ;;; END DCL NAPRECHNI ITEMS
             }},
 
@@ -463,6 +464,7 @@ namespace PpsMenu
             { "MAKESURF", "MAKESURF" },
             { "AreaHumus", "AreaHumus" },
             { "AreaIzkop", "AreaIzkop" },
+            { "AreaBZP", "AreaBZP" },
         // ;;; END COMMAND MAP
         };
     }
