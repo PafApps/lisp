@@ -249,6 +249,7 @@ namespace PpsMenu
                 new MenuItem { Key = "PDFall", Label = "PDFall", Description = "- Прави пдф-и на всички файлове - dwg, word и excel в избрана папка", AutoCADCommand = "PDFall" },
                 new MenuItem { Key = "PDFselect", Label = "PDFselect", Description = "- Прави pdf на избрани файлове. Може да заредите колкото искате файлове", AutoCADCommand = "PDFselect" },
                 new MenuItem { Key = "dwgcivil", Label = "dwgcivil", Description = "- Добавя "Отвори в Сивил" при десен бутон на даден dwg файл", AutoCADCommand = "dwgcivil" },
+                new MenuItem { Key = "dwgreadonly", Label = "dwgreadonly", Description = "- Добавя "Отвори Read Only" при десен бутон на даден dwg файл", AutoCADCommand = "dwgreadonly" },
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -467,6 +468,7 @@ namespace PpsMenu
             { "AreaIzkop", "AreaIzkop" },
             { "AreaBZP", "AreaBZP" },
             { "dwgcivil", "dwgcivil" },
+            { "dwgreadonly", "dwgreadonly" },
         // ;;; END COMMAND MAP
         };
     }
