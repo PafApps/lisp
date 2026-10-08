@@ -250,6 +250,7 @@ namespace PpsMenu
                 new MenuItem { Key = "PDFselect", Label = "PDFselect", Description = "- Прави pdf на избрани файлове. Може да заредите колкото искате файлове", AutoCADCommand = "PDFselect" },
                 new MenuItem { Key = "dwgcivil", Label = "dwgcivil", Description = "- Добавя "Отвори в Сивил" при десен бутон на даден dwg файл", AutoCADCommand = "dwgcivil" },
                 new MenuItem { Key = "dwgreadonly", Label = "dwgreadonly", Description = "- Добавя "Отвори Read Only" при десен бутон на даден dwg файл", AutoCADCommand = "dwgreadonly" },
+                new MenuItem { Key = "dwgreset", Label = "dwgreset", Description = "- Връща всички регистри в дефоулт състояние (отваряне на двг файл в един, меню за отвори в сивил и отвори read only)", AutoCADCommand = "dwgreset" },
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -469,6 +470,7 @@ namespace PpsMenu
             { "AreaBZP", "AreaBZP" },
             { "dwgcivil", "dwgcivil" },
             { "dwgreadonly", "dwgreadonly" },
+            { "dwgreset", "dwgreset" },
         // ;;; END COMMAND MAP
         };
     }
