@@ -81,6 +81,7 @@ namespace PpsMenu
                 new MenuItem { Key = "3D2D", Label = "3D2D", Description = "- Преобразува 3D полилиния в 2D полилиния със Z=0", AutoCADCommand = "3D2D" },
                 new MenuItem { Key = "DITCHEND", Label = "DITCHEND", Description = "- В сивилски файл поставяме блока за начало било и край на канавките, като взима километража и посоката от Алаймънта", AutoCADCommand = "DITCHEND" },
                 new MenuItem { Key = "tkmshaft", Label = "tkmshaft", Description = "- Поставя шахтите на ТКМ в ситуация, като ги завърта, ако се избере динамичния блок TKM-Shafts", AutoCADCommand = "tkmshaft" },
+                new MenuItem { Key = "PoleNum", Label = "PoleNum", Description = "- Взима номерата на стълбовете от блоковете от Контактна мрежа и ги записва до самите стълбове", AutoCADCommand = "PoleNum" },
              // ;;; END DCL SITUACIA ITEMS
             }},
 
@@ -473,6 +474,7 @@ namespace PpsMenu
             { "dwgreadonly", "dwgreadonly" },
             { "dwgreset", "dwgreset" },
             { "PsPlan", "PsPlan" },
+            { "PoleNum", "PoleNum" },
         // ;;; END COMMAND MAP
         };
     }
