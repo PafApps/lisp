@@ -255,6 +255,7 @@ namespace PpsMenu
                 new MenuItem { Key = "dwgcivil", Label = "dwgcivil", Description = "- Добавя "Отвори в Сивил" при десен бутон на даден dwg файл", AutoCADCommand = "dwgcivil" },
                 new MenuItem { Key = "dwgreadonly", Label = "dwgreadonly", Description = "- Добавя "Отвори Read Only" при десен бутон на даден dwg файл", AutoCADCommand = "dwgreadonly" },
                 new MenuItem { Key = "dwgreset", Label = "dwgreset", Description = "- Връща всички регистри в дефоулт състояние (отваряне на двг файл в един, меню за отвори в сивил и отвори read only)", AutoCADCommand = "dwgreset" },
+                new MenuItem { Key = "CopyDimStyle", Label = "CopyDimStyle", Description = "- Маркирате дадена дименсия и копира пропъртита и създавате нов дименсионен стил със същите пропъртиис", AutoCADCommand = "CopyDimStyle" },
             // ;;; END DCL DRUGI ITEMS
             }},
 
@@ -479,6 +480,7 @@ namespace PpsMenu
             { "PoleNum", "PoleNum" },
             { "podpisiall-1fail", "podpisiall-1fail" },
             { "podpisiall-bezTTB", "podpisiall-bezTTB" },
+            { "CopyDimStyle", "CopyDimStyle" },
         // ;;; END COMMAND MAP
         };
     }
