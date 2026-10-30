@@ -205,6 +205,7 @@ namespace PpsMenu
                 new MenuItem { Key = "RWCLayoutAdd", Label = "RWCLayoutAdd", Description = "- Прави и вмъква лейаут в напречните профили, като спрямо километража го вмъква и спрямо номера в рамката го именува", AutoCADCommand = "RWCLayoutAdd" },
                 new MenuItem { Key = "PsPlan", Label = "PsPlan", Description = "- Създава легенда за лейаутите (змия с правоъгълните лейаути с номерца и щтриховка за този лейаут)", AutoCADCommand = "PsPlan" },
                 new MenuItem { Key = "podpisiall-1fail", Label = "podpisiall-1fail", Description = "- Попълва автоматично всички подписи във файла", AutoCADCommand = "podpisiall-1fail" },
+                new MenuItem { Key = "podpisiall-bezTTB", Label = "podpisiall-bezTTB", Description = "- Попълва автоматично всички подписи във файла, които не са във TTB (тези специфични за различните фирми извън тайтъл блока)", AutoCADCommand = "podpisiall-bezTTB" },
             // ;;; END DCL LAYOUTI ITEMS
             }},
 
@@ -477,6 +478,7 @@ namespace PpsMenu
             { "PsPlan", "PsPlan" },
             { "PoleNum", "PoleNum" },
             { "podpisiall-1fail", "podpisiall-1fail" },
+            { "podpisiall-bezTTB", "podpisiall-bezTTB" },
         // ;;; END COMMAND MAP
         };
     }
