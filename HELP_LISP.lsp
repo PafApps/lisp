@@ -159,6 +159,7 @@ namespace PpsMenu
                 new MenuItem { Key = "AreaHumus", Label = "AreaHumus", Description = "- Огражда хумуса в напречния профил. Слоевете трябва да са коректни, ако не са свържи се с Паф", AutoCADCommand = "AreaHumus" },
                 new MenuItem { Key = "AreaIzkop", Label = "AreaIzkop", Description = "- Огражда изкопа. При по-сложни изкопи може да дава грешки, затова преглеждайте! Помага преди това да е ограден хумуса.", AutoCADCommand = "AreaIzkop" },
                 new MenuItem { Key = "AreaBZP", Label = "AreaBZP", Description = "- Огражда нов баласт, защитен пласт и подобрен пласт (ако има). Отново преглеждайте за грешки!", AutoCADCommand = "AreaBZP" },
+                new MenuItem { Key = "D3FREE", Label = "D3FREE", Description = "- Прави dl-ки в текущия слой, като може да се посочи точно къде в таблицата да се попълнят dl-ките.", AutoCADCommand = "D3FREE" },
             // ;;; END DCL NAPRECHNI ITEMS
             }},
 
@@ -481,6 +482,7 @@ namespace PpsMenu
             { "podpisiall-1fail", "podpisiall-1fail" },
             { "podpisiall-bezTTB", "podpisiall-bezTTB" },
             { "CopyDimStyle", "CopyDimStyle" },
+            { "D3FREE", "D3FREE" },
         // ;;; END COMMAND MAP
         };
     }
