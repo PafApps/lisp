@@ -161,6 +161,7 @@ namespace PpsMenu
                 new MenuItem { Key = "AreaBZP", Label = "AreaBZP", Description = "- Огражда нов баласт, защитен пласт и подобрен пласт (ако има). Отново преглеждайте за грешки!", AutoCADCommand = "AreaBZP" },
                 new MenuItem { Key = "D3FREE", Label = "D3FREE", Description = "- Прави dl-ки в текущия слой, като може да се посочи точно къде в таблицата да се попълнят dl-ките.", AutoCADCommand = "D3FREE" },
                 new MenuItem { Key = "ogradifix", Label = "ogradifix", Description = "- Когато сме преместили оградата и искаме автоматично да я коригираме в напречните профили, прехвърляме новите блокове с разширение -new и с тази команда преместваме старите огради на новите места", AutoCADCommand = "ogradifix" },
+                new MenuItem { Key = "ogradidim", Label = "ogradidim", Description = "- Автоматично слага дименсиите на оградите до най-близката проекта ос", AutoCADCommand = "ogradidim" },
             // ;;; END DCL NAPRECHNI ITEMS
             }},
 
@@ -485,6 +486,7 @@ namespace PpsMenu
             { "CopyDimStyle", "CopyDimStyle" },
             { "D3FREE", "D3FREE" },
             { "ogradifix", "ogradifix" },
+            { "ogradidim", "ogradidim" },
         // ;;; END COMMAND MAP
         };
     }
