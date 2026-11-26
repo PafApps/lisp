@@ -163,6 +163,7 @@ namespace PpsMenu
                 new MenuItem { Key = "ogradifix", Label = "ogradifix", Description = "- Когато сме преместили оградата и искаме автоматично да я коригираме в напречните профили, прехвърляме новите блокове с разширение -new и с тази команда преместваме старите огради на новите места", AutoCADCommand = "ogradifix" },
                 new MenuItem { Key = "ogradidim", Label = "ogradidim", Description = "- Автоматично слага дименсиите на оградите до най-близката проекта ос", AutoCADCommand = "ogradidim" },
                 new MenuItem { Key = "sounddim", Label = "sounddim", Description = "- Автоматично слага дименсиите на шумозащитните екрани до най-близката проекта ос", AutoCADCommand = "sounddim" },
+                new MenuItem { Key = "bounddim", Label = "bounddim", Description = "- Автоматично слага дименсиите на границата на собственост до най-близката проекта ос", AutoCADCommand = "bounddim" },
             // ;;; END DCL NAPRECHNI ITEMS
             }},
 
@@ -489,6 +490,7 @@ namespace PpsMenu
             { "ogradifix", "ogradifix" },
             { "ogradidim", "ogradidim" },
             { "sounddim", "sounddim" },
+            { "bounddim", "bounddim" },
         // ;;; END COMMAND MAP
         };
     }
